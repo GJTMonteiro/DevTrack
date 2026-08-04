@@ -2,6 +2,7 @@ import StatCard from "../Dashboard/StatCard";
 import Avatar from "../../assets/stussy-night.jpeg";
 
 import "./Profile.css";
+import ReactCountryFlag from "react-country-flag";
 
 import {
   MdFolderOpen,
@@ -12,24 +13,15 @@ import {
 
 const user = {
   name: "Guilherme Monteiro",
-  role: "Front & Back Developer",
-  email: "xxxxxxxxx@gmail.com",
-  location: "Portugal",
 
-  details: [
-    {
-      label: "Username",
-      value: "GJTMonteiro",
-    },
-    {
-      label: "Country",
-      value: "Portugal",
-    },
-    {
-      label: "Member Since",
-      value: "August 2026",
-    },
-  ],
+  role: "Front & Back Developer",
+
+  email: "xxxxxxxxx@gmail.com",
+
+  location: {
+    name: "Japan",
+    code: "JP",
+  },
 
   skills: [
     "React",
@@ -55,6 +47,22 @@ const user = {
   ],
 };
 
+const details = [
+  {
+    label: "Username",
+    value: "GJTMonteiro",
+  },
+  {
+    label: "Country",
+    value: user.location.name,
+  },
+  {
+    label: "Member Since",
+    value: "August 2026",
+  },
+];
+
+
 function Profile() {
   function handleEditProfile() {
     console.log("Edit Profile");
@@ -74,7 +82,17 @@ function Profile() {
 
           <p className="profile-email">{user.email}</p>
 
-          <p className="profile-location">{user.location}</p>
+          <p className="profile-location">
+            <ReactCountryFlag
+              countryCode={user.location.code}
+              svg
+              style={{
+                width: "1.4em",
+                height: "1.4em"
+              }}
+            />
+            <span>{user.location.name}</span>
+          </p>
         </div>
 
         <button
@@ -89,7 +107,7 @@ function Profile() {
       <div className="profile-details">
         <h2>Profile Details</h2>
 
-        {user.details.map((detail) => (
+        {details.map((detail) => (
           <div className="profile-detail" key={detail.label}>
             <span>{detail.label}</span>
             <strong>{detail.value}</strong>
