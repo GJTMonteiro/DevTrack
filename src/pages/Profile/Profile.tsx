@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom';
+
 import StatCard from '../Dashboard/StatCard';
 import Avatar from '../../assets/stussy-night.jpeg';
 
@@ -34,11 +36,11 @@ const user = {
   ],
 
   actions: [
-    'Edit Profile',
-    'Change Password',
-    'Security',
-    'Notifications',
-    'Logout',
+    { label: 'Edit Profile', action: "edit" },
+    { label: 'Change Password', action: "password" },
+    { label: 'Security', action: "security" },
+    { label: 'Notifications', action: "notifications" },
+    { label: 'Logout', action: "logout" },
   ],
 };
 
@@ -60,8 +62,18 @@ const details = [
 ];
 
 function Profile() {
+  const navigate = useNavigate();
+
   function handleEditProfile() {
-    console.log('Edit Profile');
+    console.log("Edit Profile");
+  }
+
+  function handleLogout(){
+    localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
+    console.log("Logout");
+
+  navigate("/login");
   }
 
   return (
@@ -166,8 +178,17 @@ function Profile() {
 
         <ul>
           {user.actions.map((action) => (
-            <li key={action}>
-              <button type="button">{action}</button>
+            <li key={action.action}>
+              <button 
+              type="button"
+              onClick={() => {
+                if(action.action === "logout") {
+                  handleLogout();
+                }
+              }}
+              >
+                {action.label}
+              </button>
             </li>
           ))}
         </ul>

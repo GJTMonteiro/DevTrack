@@ -10,37 +10,39 @@ import Project from "../pages/Project/Project";
 import Projects from "../pages/Projects/Projects";
 import Settings from "../pages/Settings/Settings";
 import Tasks from "../pages/Tasks/Tasks";
+import ForgotPassword from "../pages/ForgotPassword/ForgotPassword";
 
+import PrivateRoute from "./PrivateRoute";
+import PublicRoute from "./PublicRoute";
 
 function AppRoutes() {
-    return(
-        <Routes>
+  return (
+    <Routes>
 
-            <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/" element={<Navigate to="/login" replace />} />
 
-            <Route path="/login" element={<Login />} />
+      <Route element={<PublicRoute />}>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+      </Route>
 
-            <Route path="/register" element={<Register />} />
+      <Route element={<PrivateRoute />}>
+        <Route element={<DashboardLayout />}>
 
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/project" element={<Project />} />
+          <Route path="/projects" element={<Projects />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/tasks" element={<Tasks />} />
+          
 
-            <Route path="/" element={<DashboardLayout />}>
+        </Route>
+      </Route>
 
-                <Route path="dashboard" element={<Dashboard />} />
-
-                <Route path="profile" element={<Profile />} />
-
-                <Route path="project" element={<Project />} />
-
-                <Route path="projects" element={<Projects />} />
-
-                <Route path="settings" element={<Settings />} />
-
-                <Route path="tasks" element={<Tasks />} />
-
-            </Route>
-
-        </Routes>
-    );
+    </Routes>
+  );
 }
 
 export default AppRoutes;

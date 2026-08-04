@@ -1,6 +1,6 @@
 import '../Auth/Auth.css';
 
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from 'react-router-dom';
 
 import {
     MdCheckCircle,
@@ -10,15 +10,18 @@ import {
 } from 'react-icons/md';
 
 
-function Register() {
+function ForgotPassword() {
+
     const navigate = useNavigate();
 
-    function handleRegister(e: React.FormEvent) {
+
+    function handleReset(e: React.FormEvent) {
         e.preventDefault();
 
-        localStorage.setItem("token", "devtrack-token");
+        // Simulação temporária
+        alert("If an account exists, a reset link was sent.");
 
-        navigate("/dashboard");
+        navigate('/login');
     }
 
 
@@ -77,6 +80,7 @@ function Register() {
 
                     </div>
 
+
                 </div>
 
 
@@ -87,12 +91,12 @@ function Register() {
                     <div className="auth-card-header">
 
                         <h2>
-                            Create Account
+                            Reset Password
                         </h2>
 
 
                         <p>
-                            Join DevTrack and manage your projects
+                            Enter your email to receive password reset instructions.
                         </p>
 
                     </div>
@@ -101,49 +105,31 @@ function Register() {
 
                     <form
                         className="auth-form"
-                        onSubmit={handleRegister}
+                        onSubmit={handleReset}
                     >
 
 
-                        <input
-                            type="text"
-                            placeholder="Name"
-                            required
-                        />
+                        <label 
+                            htmlFor="email" 
+                            className="sr-only"
+                        >
+                            Email
+                        </label>
 
 
                         <input
-                            type="text"
-                            placeholder="Username"
-                            required
-                        />
-
-
-                        <input
+                            id="email"
+                            name="email"
                             type="email"
                             placeholder="Email"
+                            autoComplete="email"
                             required
                         />
 
 
-                        <input
-                            type="password"
-                            placeholder="Password"
-                            required
-                        />
 
-
-                        <input
-                            type="password"
-                            placeholder="Confirm Password"
-                            required
-                        />
-
-
-                        <button
-                            type="submit"
-                        >
-                            Create Account
+                        <button type="submit">
+                            Send Reset Link
                         </button>
 
 
@@ -153,7 +139,7 @@ function Register() {
 
                     <p className="auth-footer">
 
-                        Already have an account?{" "}
+                        Remember your password?{" "}
 
                         <Link to="/login">
                             Login
@@ -173,4 +159,4 @@ function Register() {
 }
 
 
-export default Register;
+export default ForgotPassword;

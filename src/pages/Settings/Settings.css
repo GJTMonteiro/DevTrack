@@ -1,0 +1,272 @@
+.settings-page {
+
+    padding: 30px;
+
+    color: var(--text-primary);
+
+}
+
+
+
+.settings-header {
+
+    margin-bottom: 30px;
+
+}
+
+
+.settings-header h1 {
+
+    font-size: 32px;
+
+    margin-bottom: 8px;
+
+}
+
+
+
+.settings-header p {
+
+    color: var(--text-secondary);
+
+}
+
+
+
+
+
+.settings-card {
+
+    background: var(--card-background);
+
+    border: 1px solid var(--border-color);
+
+    border-radius: 16px;
+
+    padding: 25px;
+
+    margin-bottom: 25px;
+
+}
+
+
+
+
+
+.settings-card-title {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin-bottom: 25px;
+
+}
+
+
+
+.settings-card-title svg {
+
+    font-size: 24px;
+
+    color: var(--color-primary);
+
+}
+
+
+
+.settings-card-title h2 {
+
+    font-size: 20px;
+
+}
+
+
+
+
+
+.settings-form {
+
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 20px;
+
+}
+
+
+
+
+.settings-group {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+}
+
+
+
+.settings-group label {
+
+    font-size: 14px;
+
+    color: var(--text-secondary);
+
+}
+
+
+
+.settings-group input {
+
+    padding: 12px 14px;
+
+    border-radius: 10px;
+
+    border: 1px solid var(--border-color);
+
+    background: var(--input-background);
+
+    color: var(--text-primary);
+
+    outline: none;
+
+}
+
+
+
+
+
+.settings-option {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    padding: 15px 0;
+
+    border-bottom: 1px solid var(--border-color);
+
+}
+
+
+
+.settings-option:last-child {
+
+    border-bottom: none;
+
+}
+
+
+
+
+.settings-option span {
+
+    font-size: 15px;
+
+}
+
+
+
+
+
+.settings-option button {
+
+    padding: 10px 18px;
+
+    border-radius: 10px;
+
+    border: none;
+
+    cursor: pointer;
+
+    background: var(--color-primary);
+
+    color: white;
+
+    font-weight: 600;
+
+}
+
+
+
+
+
+.settings-option input[type="checkbox"] {
+
+    width: 18px;
+
+    height: 18px;
+
+    cursor: pointer;
+
+}
+
+
+
+
+
+.logout-button {
+
+    width: 100%;
+
+    padding: 14px;
+
+    border-radius: 12px;
+
+    border: none;
+
+    cursor: pointer;
+
+    background: #ef4444;
+
+    color: white;
+
+    font-weight: 700;
+
+    font-size: 15px;
+
+    transition: 0.25s;
+
+}
+
+
+
+.logout-button:hover {
+
+    transform: translateY(-2px);
+
+    opacity: 0.9;
+
+}
+
+
+
+
+
+@media (max-width: 768px) {
+
+
+    .settings-page {
+
+        padding: 20px;
+
+    }
+
+
+
+    .settings-form {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+}
