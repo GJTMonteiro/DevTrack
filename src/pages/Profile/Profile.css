@@ -47,10 +47,23 @@
 }
 
 .profile-name {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+
     font-size: 2rem;
     font-weight: 700;
 
     color: var(--color-text);
+}
+
+.profile-name svg {
+    width: 1.2em;
+    height: 1.2em;
+
+    border-radius: 4px;
+
+    flex-shrink: 0;
 }
 
 .profile-role {
@@ -60,18 +73,6 @@
 
 .profile-email {
     color: var(--color-text-secondary);
-}
-
-.profile-location {
-    display: flex;
-    align-items: center;
-    gap: .6rem;
-
-    color: var(--color-text-secondary);
-}
-
-.profile-location svg {
-    border-radius: 4px;
 }
 
 .profile-edit-btn {
@@ -185,7 +186,7 @@
 
 .skill-badge:hover {
     background: var(--color-primary);
-    color: white;
+    color: #fff;
 }
 
 /* ==========================
@@ -248,7 +249,7 @@
 
 .profile-actions button:hover {
     background: var(--color-primary);
-    color: white;
+    color: #fff;
 }
 
 /* ==========================
@@ -271,7 +272,7 @@
         align-items: center;
     }
 
-    .profile-location {
+    .profile-name {
         justify-content: center;
     }
 

@@ -20,7 +20,7 @@ const user = {
 
   location: {
     name: "Japan",
-    code: "JP", 
+    code: "JP",
   },
 
   skills: [
@@ -62,7 +62,6 @@ const details = [
   },
 ];
 
-
 function Profile() {
   function handleEditProfile() {
     console.log("Edit Profile");
@@ -76,23 +75,23 @@ function Profile() {
         </div>
 
         <div className="profile-info">
-          <h1 className="profile-name">{user.name}</h1>
+          <h1 className="profile-name">
+            <ReactCountryFlag
+              countryCode={user.location.code}
+              svg
+              title={user.location.name}
+              style={{
+                width: "1.2em",
+                height: "1.2em",
+              }}
+            />
+
+            <span>{user.name}</span>
+          </h1>
 
           <p className="profile-role">{user.role}</p>
 
           <p className="profile-email">{user.email}</p>
-
-          <p className="profile-location">
-            <ReactCountryFlag
-              countryCode={user.location.code}
-              svg
-              style={{
-                width: "1.4em",
-                height: "1.4em"
-              }}
-            />
-            <span>{user.location.name}</span>
-          </p>
         </div>
 
         <button
