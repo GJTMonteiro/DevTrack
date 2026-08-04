@@ -1,70 +1,67 @@
-import StatCard from "../Dashboard/StatCard";
-import Avatar from "../../assets/stussy-night.jpeg";
+import StatCard from '../Dashboard/StatCard';
+import Avatar from '../../assets/stussy-night.jpeg';
 
-import "./Profile.css";
-import ReactCountryFlag from "react-country-flag";
+import './Profile.css';
+
+import ReactCountryFlag from 'react-country-flag';
 
 import {
   MdFolderOpen,
   MdTaskAlt,
   MdCheckCircle,
   MdTrendingUp,
-} from "react-icons/md";
+} from 'react-icons/md';
 
 const user = {
-  name: "Guilherme Monteiro",
+  name: 'Guilherme Monteiro',
 
-  role: "Front & Back Developer",
+  role: 'Front & Back Developer',
 
-  email: "xxxxxxxxx@gmail.com",
+  email: 'xxxxxxxxx@gmail.com',
 
   location: {
-    name: "Japan",
-    code: "JP",
+    name: 'Japan',
+    code: 'JP',
   },
 
-  skills: [
-    "React",
-    "TypeScript",
-    "Git",
-    "Node.js",
-    "Express",
-  ],
+  skills: ['React', 'TypeScript', 'Git', 'Node.js', 'Express'],
 
   activity: [
-    "Created DevTrack",
-    "Completed 8 tasks",
-    "Updated profile",
-    "Joined workspace",
+    'Created DevTrack',
+    'Completed 8 tasks',
+    'Updated profile',
+    'Joined workspace',
   ],
 
   actions: [
-    "Edit Profile",
-    "Change Password",
-    "Security",
-    "Notifications",
-    "Logout",
+    'Edit Profile',
+    'Change Password',
+    'Security',
+    'Notifications',
+    'Logout',
   ],
 };
 
 const details = [
   {
-    label: "Username",
-    value: "GJTMonteiro",
+    label: 'Username',
+    value: 'GJTMonteiro',
   },
+
   {
-    label: "Country",
+    label: 'Country',
     value: user.location.name,
   },
+
   {
-    label: "Member Since",
-    value: "August 2026",
+    label: 'Member Since',
+    value: 'August 2026',
   },
 ];
 
 function Profile() {
   function handleEditProfile() {
-    console.log("Edit Profile");
+    console.log('Edit Profile');
   }
 
   return (
@@ -76,15 +73,13 @@ function Profile() {
 
         <div className="profile-info">
           <h1 className="profile-name">
-            <ReactCountryFlag
-              countryCode={user.location.code}
-              svg
-              title={user.location.name}
-              style={{
-                width: "1.2em",
-                height: "1.2em",
-              }}
-            />
+            <span className="country-flag-wrapper">
+              <ReactCountryFlag
+                countryCode={user.location.code}
+                title={user.location.name}
+                className="country-flag"
+              />
+            </span>
 
             <span>{user.name}</span>
           </h1>
@@ -97,8 +92,7 @@ function Profile() {
         <button
           type="button"
           className="profile-edit-btn"
-          onClick={handleEditProfile}
-        >
+          onClick={handleEditProfile}>
           Edit Profile
         </button>
       </div>
@@ -109,6 +103,7 @@ function Profile() {
         {details.map((detail) => (
           <div className="profile-detail" key={detail.label}>
             <span>{detail.label}</span>
+
             <strong>{detail.value}</strong>
           </div>
         ))}

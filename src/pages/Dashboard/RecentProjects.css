@@ -1,50 +1,161 @@
 .recent-projects-section {
-  margin-top: 30px;
+
+    margin-top: 30px;
+
 }
+
+
+
+/* ==========================
+   CONTAINER
+========================== */
+
 
 .recent-projects {
-  background: #111111;
 
-  border: 1px solid #222;
-  border-radius: 18px;
+    background: var(--color-surface);
 
-  padding: 24px;
+    border: 1px solid var(--color-border);
+
+    border-radius: var(--radius-xl);
+
+    padding: 24px;
+
+    box-shadow: var(--shadow-sm);
+
+    transition: var(--transition-normal);
+
 }
+
+
+
+.recent-projects:hover {
+
+    box-shadow: var(--shadow-md);
+
+}
+
+
+
+
+
+/* ==========================
+   HEADER
+========================== */
+
 
 .recent-projects-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 
-  margin-bottom: 24px;
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 24px;
+
 }
+
+
 
 .recent-projects-title {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: #ffffff;
+
+    font-size: 1.2rem;
+
+    font-weight: 700;
+
+    color: var(--color-text);
+
 }
+
+
+
+
+
+/* ==========================
+   VIEW ALL BUTTON
+========================== */
+
 
 .project-viewall-btn {
-  padding: 8px 16px;
 
-  background: transparent;
+    padding: 8px 16px;
 
-  color: #8b5cf6;
+    background: transparent;
 
-  border: 1px solid #8b5cf6;
-  border-radius: 8px;
+    color: var(--color-primary);
 
-  cursor: pointer;
+    border: 1px solid var(--color-primary);
 
-  transition: 0.25s;
+    border-radius: var(--radius-md);
+
+    cursor: pointer;
+
+    font-weight: 600;
+
+    transition: var(--transition-fast);
+
 }
+
+
 
 .project-viewall-btn:hover {
-  background: #8b5cf6;
-  color: white;
+
+    background: var(--color-primary);
+
+    color: #ffffff;
+
 }
 
+
+
+
+
+/* ==========================
+   PROJECT CARDS SPACING
+========================== */
+
+
 .recent-projects .project-card + .project-card {
-  margin-top: 16px;
+
+    margin-top: 16px;
+
+}
+
+
+
+
+
+/* ==========================
+   RESPONSIVE
+========================== */
+
+
+@media(max-width:700px) {
+
+
+    .recent-projects {
+
+        padding: 18px;
+
+    }
+
+
+    .recent-projects-header {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 15px;
+
+    }
+
+
+    .project-viewall-btn {
+
+        width: 100%;
+
+    }
+
 }

@@ -2,6 +2,7 @@ import './Dashboard.css';
 
 import StatCard from './StatCard';
 import RecentProjects from './RecentProjects';
+import RecentTasks from './RecentTasks';
 
 import {
   MdFolderOpen,
@@ -33,7 +34,7 @@ function Dashboard() {
   }
 
   return (
-    <main className="dashboard">
+     <main className="dashboard">   
       <section className="dashboard-welcome">
         <div className="welcome-info">
           <h1>{greeting}</h1>
@@ -75,7 +76,9 @@ function Dashboard() {
       <section className="dashboard-recent-projects">
         <RecentProjects />
       </section>
-      <section className="dashboard-recent-tasks"></section>
+      <section className="dashboard-recent-tasks">
+        <RecentTasks />
+      </section>
       <section className="dashboard-timeline"></section>
     </main>
   );

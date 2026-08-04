@@ -9,7 +9,7 @@ import Profile from "../pages/Profile/Profile";
 import Project from "../pages/Project/Project";
 import Projects from "../pages/Projects/Projects";
 import Settings from "../pages/Settings/Settings";
-import Tasks from "../pages/Tasks/Task";
+import Tasks from "../pages/Tasks/Tasks";
 
 
 function AppRoutes() {
