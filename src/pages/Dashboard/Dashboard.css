@@ -1,0 +1,65 @@
+.dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.dashboard-welcome {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.welcome-info h1 {
+    font-size: 2rem;
+    color: #111827;
+    margin-bottom: 8px;
+}
+
+.welcome-info p {
+    color: #6b7280;
+    margin-bottom: 6px;
+}
+
+.welcome-info span {
+    color: #9ca3af;
+    font-size: 0.9rem;
+}
+
+.new-project-btn {
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 24px;
+    border-radius: 12px;
+    background: #4f46e5;
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: .3s;
+}
+
+.new-project-btn:hover {
+    background: #4338ca;
+    transform: translateY(-2px);
+}
+
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+}
+
+.dashboard-recent-projects,
+.dashboard-recent-tasks,
+.dashboard-timeline {
+    min-height: 260px;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.05);
+    padding: 25px;
+}
