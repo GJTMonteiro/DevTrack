@@ -20,7 +20,7 @@ const user = {
 
   location: {
     name: "Japan",
-    code: "JP",
+    code: "JP", 
   },
 
   skills: [
