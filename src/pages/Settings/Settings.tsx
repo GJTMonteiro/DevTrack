@@ -51,12 +51,6 @@ function Settings() {
         </div>
       </section>
 
-      {/* ================================= */}
-
-      {/* PROFILE */}
-
-      {/* ================================= */}
-
       <section className="settings-card">
         <div className="settings-card-title">
           <MdPerson />
@@ -91,12 +85,6 @@ function Settings() {
         </div>
       </section>
 
-      {/* ================================= */}
-
-      {/* APPEARANCE */}
-
-      {/* ================================= */}
-
       <section className="settings-card">
         <div className="settings-card-title">
           <MdDarkMode />
@@ -105,23 +93,23 @@ function Settings() {
         </div>
 
         <div className="settings-option">
-            <div className="settings-option-info">
-          <div>
-            <strong>Dark Mode</strong>
+          <div className="settings-option-info">
+            <div>
+              <strong>Dark Mode</strong>
 
-            <p>Switch between dark and light theme.</p>
+              <p>Switch between dark and light theme.</p>
+            </div>
+
+            <label className="switch">
+              <input
+                type="checkbox"
+                checked={darkMode}
+                onChange={handleThemeToggle}
+              />
+
+              <span className="slider"></span>
+            </label>
           </div>
-
-          <label className="switch">
-            <input
-              type="checkbox"
-              checked={darkMode}
-              onChange={handleThemeToggle}
-            />
-
-            <span className="slider"></span>
-          </label>
-        </div>
         </div>
 
         <div className="settings-option">
@@ -137,12 +125,6 @@ function Settings() {
           </button>
         </div>
       </section>
-
-      {/* ================================= */}
-
-      {/* NOTIFICATIONS */}
-
-      {/* ================================= */}
 
       <section className="settings-card">
         <div className="settings-card-title">
@@ -206,12 +188,6 @@ function Settings() {
         </div>
       </section>
 
-      {/* ================================= */}
-
-      {/* SECURITY */}
-
-      {/* ================================= */}
-
       <section className="settings-card">
         <div className="settings-card-title">
           <MdSecurity />
@@ -240,12 +216,6 @@ function Settings() {
         </div>
       </section>
 
-      {/* ================================= */}
-
-      {/* WORKSPACE */}
-
-      {/* ================================= */}
-
       <section className="settings-card">
         <div className="settings-card-title">
           <MdStorage />
@@ -273,12 +243,6 @@ function Settings() {
           <button className="settings-button">Clear</button>
         </div>
       </section>
-
-      {/* ================================= */}
-
-      {/* DANGER ZONE */}
-
-      {/* ================================= */}
 
       <section className="settings-card danger-zone">
         <div className="settings-card-title">

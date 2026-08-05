@@ -1,0 +1,210 @@
+.project-card {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+
+    padding: 22px;
+
+    background: var(--color-background);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+
+    transition: var(--transition-normal);
+}
+
+.project-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-md);
+}
+
+/* ==========================
+   HEADER
+========================== */
+
+.project-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.project-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.project-title h3 {
+    margin: 0;
+
+    font-size: 1.15rem;
+    font-weight: 700;
+
+    color: var(--color-text);
+}
+
+.project-icon {
+    width: 46px;
+    height: 46px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border-radius: 12px;
+
+    background: rgba(59, 130, 246, .12);
+
+    color: var(--color-primary);
+
+    font-size: 24px;
+}
+
+.project-menu {
+    border: none;
+    background: transparent;
+
+    cursor: pointer;
+
+    color: var(--color-text-secondary);
+
+    font-size: 22px;
+
+    transition: .2s;
+}
+
+.project-menu:hover {
+    color: var(--color-primary);
+}
+
+/* ==========================
+   PRIORITY
+========================== */
+
+.project-priority {
+    width: fit-content;
+
+    padding: 6px 14px;
+
+    border-radius: 999px;
+
+    font-size: .8rem;
+    font-weight: 600;
+}
+
+.project-priority.high {
+    background: rgba(239, 68, 68, .15);
+    color: #ef4444;
+}
+
+.project-priority.medium {
+    background: rgba(245, 158, 11, .15);
+    color: #f59e0b;
+}
+
+.project-priority.low {
+    background: rgba(34, 197, 94, .15);
+    color: #22c55e;
+}
+
+/* ==========================
+   DESCRIPTION
+========================== */
+
+.project-description {
+    margin: 0;
+
+    color: var(--color-text-secondary);
+
+    line-height: 1.6;
+}
+
+/* ==========================
+   PROGRESS
+========================== */
+
+.project-progress {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+
+    font-size: .9rem;
+    color: var(--color-text-secondary);
+}
+
+.progress-bar {
+    width: 100%;
+    height: 10px;
+
+    background: var(--color-hover);
+
+    border-radius: 999px;
+
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+
+    background: linear-gradient(
+        90deg,
+        var(--color-primary),
+        #60a5fa
+    );
+
+    border-radius: 999px;
+
+    transition: width .4s ease;
+}
+
+/* ==========================
+   FOOTER
+========================== */
+
+.project-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding-top: 16px;
+
+    border-top: 1px solid var(--color-border);
+}
+
+.project-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    color: var(--color-text-secondary);
+
+    font-size: .9rem;
+}
+
+.project-info svg {
+    color: var(--color-primary);
+    font-size: 18px;
+}
+
+/* ==========================
+   RESPONSIVE
+========================== */
+
+@media (max-width: 768px) {
+
+    .project-card {
+        padding: 18px;
+    }
+
+    .project-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+}

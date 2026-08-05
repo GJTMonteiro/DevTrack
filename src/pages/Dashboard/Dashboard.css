@@ -1,65 +1,127 @@
 .dashboard {
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
+  padding: 40px;
+
+  min-height: 100vh;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 35px;
+
+  background: var(--color-background);
+
+  color: var(--color-text);
 }
 
+/* ==========================
+   WELCOME
+========================== */
+
 .dashboard-welcome {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 30px;
-    background: #ffffff;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
 }
 
 .welcome-info h1 {
-    font-size: 2rem;
-    color: #111827;
-    margin-bottom: 8px;
+  margin: 0;
+
+  font-size: 2.2rem;
 }
 
 .welcome-info p {
-    color: #6b7280;
-    margin-bottom: 6px;
+  margin-top: 8px;
+
+  color: var(--color-text-secondary);
 }
 
 .welcome-info span {
-    color: #9ca3af;
-    font-size: 0.9rem;
+  color: var(--color-text-secondary);
+
+  font-size: 0.9rem;
 }
 
+/* ==========================
+   BUTTON
+========================== */
+
 .new-project-btn {
-    border: none;
-    outline: none;
-    cursor: pointer;
-    padding: 14px 24px;
-    border-radius: 12px;
-    background: #4f46e5;
-    color: #fff;
-    font-size: 0.95rem;
-    font-weight: 600;
-    transition: .3s;
+  background: var(--color-primary);
+
+  color: white;
+
+  border: none;
+
+  padding: 13px 24px;
+
+  border-radius: 10px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: var(--transition-normal);
 }
 
 .new-project-btn:hover {
-    background: #4338ca;
-    transform: translateY(-2px);
+  background: var(--color-primary-hover);
+
+  transform: translateY(-2px);
 }
 
+/* ==========================
+   STATS
+========================== */
+
 .dashboard-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 20px;
+  display: grid;
+
+  grid-template-columns: repeat(4, 1fr);
+
+  gap: 25px;
 }
+
+/* ==========================
+   SECTIONS
+========================== */
 
 .dashboard-recent-projects,
 .dashboard-recent-tasks,
 .dashboard-timeline {
-    min-height: 260px;
-    background: #ffffff;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,.05);
+  width: 100%;
+}
+
+/* ==========================
+   RESPONSIVE
+========================== */
+
+@media (max-width: 1200px) {
+  .dashboard-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 800px) {
+  .dashboard {
     padding: 25px;
+  }
+
+  .dashboard-welcome {
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: 20px;
+  }
+
+  .new-project-btn {
+    width: 100%;
+  }
+
+  .dashboard-stats {
+    grid-template-columns: 1fr;
+  }
 }
