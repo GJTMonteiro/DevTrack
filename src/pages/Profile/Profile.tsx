@@ -15,7 +15,7 @@ import {
 } from 'react-icons/md';
 
 const user = {
-  name: 'Guilherme Monteiro',
+  name: localStorage.getItem('userName') ?? 'Developer',
 
   role: 'Front & Back Developer',
 
@@ -36,11 +36,11 @@ const user = {
   ],
 
   actions: [
-    { label: 'Edit Profile', action: "edit" },
-    { label: 'Change Password', action: "password" },
-    { label: 'Security', action: "security" },
-    { label: 'Notifications', action: "notifications" },
-    { label: 'Logout', action: "logout" },
+    { label: 'Edit Profile', action: 'edit' },
+    { label: 'Change Password', action: 'password' },
+    { label: 'Security', action: 'security' },
+    { label: 'Notifications', action: 'notifications' },
+    { label: 'Logout', action: 'logout' },
   ],
 };
 
@@ -65,15 +65,16 @@ function Profile() {
   const navigate = useNavigate();
 
   function handleEditProfile() {
-    console.log("Edit Profile");
+    console.log('Edit Profile');
   }
 
-  function handleLogout(){
-    localStorage.removeItem("token");
-    sessionStorage.removeItem("token");
-    console.log("Logout");
+  function handleLogout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userName');
 
-  navigate("/login");
+    sessionStorage.removeItem('token');
+
+    navigate('/login');
   }
 
   return (
@@ -179,14 +180,13 @@ function Profile() {
         <ul>
           {user.actions.map((action) => (
             <li key={action.action}>
-              <button 
-              type="button"
-              onClick={() => {
-                if(action.action === "logout") {
-                  handleLogout();
-                }
-              }}
-              >
+              <button
+                type="button"
+                onClick={() => {
+                  if (action.action === 'logout') {
+                    handleLogout();
+                  }
+                }}>
                 {action.label}
               </button>
             </li>

@@ -23,22 +23,29 @@ function Dashboard() {
 
   const currentHour = currentDate.getHours();
 
-  let greeting = "";
+  let greeting = '';
 
   if (currentHour < 12) {
-    greeting = "Good Morning";
-  } else if (currentHour <18) {
-    greeting = "Good Afternoon";
+    greeting = 'Good Morning';
+  } else if (currentHour < 18) {
+    greeting = 'Good Afternoon';
   } else {
-    greeting = "Good Evening";
+    greeting = 'Good Evening';
   }
 
+  // Apenas ler o nome guardado
+  const userName = localStorage.getItem('userName') ?? 'Developer';
+
   return (
-     <main className="dashboard">   
+    <main className="dashboard">
       <section className="dashboard-welcome">
         <div className="welcome-info">
-          <h1>{greeting}</h1>
+          <h1>
+            {greeting}, {userName} 
+          </h1>
+
           <p>Overview of your work</p>
+
           <span>{formattedDate}</span>
         </div>
 
@@ -54,18 +61,21 @@ function Dashboard() {
           value={12}
           description="+2 this week"
         />
+
         <StatCard
           icon={<MdTaskAlt />}
           title="Active Tasks"
           value={34}
           description="8 due today"
         />
+
         <StatCard
           icon={<MdCheckCircle />}
           title="Completed"
           value={128}
           description="+15 this week"
         />
+
         <StatCard
           icon={<MdTrendingUp />}
           title="Productivity"
@@ -73,12 +83,15 @@ function Dashboard() {
           description="+4 this month"
         />
       </section>
+
       <section className="dashboard-recent-projects">
         <RecentProjects />
       </section>
+
       <section className="dashboard-recent-tasks">
         <RecentTasks />
       </section>
+
       <section className="dashboard-timeline"></section>
     </main>
   );
