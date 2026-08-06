@@ -163,3 +163,14 @@ export async function login(req: Request, res: Response) {
         });
     }
 }
+
+import { AuthRequest } from "../middleware/auth.middleware.js";
+
+export async function me(req: AuthRequest, res: Response) {
+
+    res.status(200).json({
+        message: "Authenticated",
+        user: req.user
+    });
+
+}

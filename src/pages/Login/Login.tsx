@@ -45,12 +45,17 @@ function Login() {
       }
 
       // Guardar JWT
-      localStorage.setItem('token', data.token);
+      localStorage.setItem(
+      'token',
+      data.token
+);
 
-      // Guardar dados do utilizador
-      localStorage.setItem('userName', data.user.name);
 
-      localStorage.setItem('username', data.user.username);
+      // Guardar utilizador
+      localStorage.setItem(
+      "user",
+      JSON.stringify(data.user)
+);
 
       navigate('/dashboard');
     } catch (error) {

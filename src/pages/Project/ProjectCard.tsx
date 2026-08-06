@@ -1,64 +1,91 @@
 import './ProjectCard.css';
 
-import { MdFolder, MdCheckCircle, MdSchedule } from 'react-icons/md';
+import type { Project } from '../../types/project';
 
-interface Project {
-  id: number;
-  title: string;
-  description: string;
-  progress: number;
-  tasks: number;
-  priority: string;
-  updated: string;
-}
+import { MdFolder, MdSchedule, MdCircle } from 'react-icons/md';
 
 interface ProjectCardProps {
   project: Project;
 }
 
 function ProjectCard({ project }: ProjectCardProps) {
+  function formatStatus(status?: string) {
+    if (!status) {
+      return 'Planning';
+    }
+
+    switch (status.toLowerCase()) {
+      case 'active':
+        return 'Active';
+
+      case 'completed':
+        return 'Completed';
+
+      case 'archived':
+        return 'Archived';
+
+      case 'planning':
+        return 'Planning';
+
+      default:
+        return status;
+    }
+  }
+
+  function formatPriority(priority?: string) {
+    if (!priority) {
+      return 'Medium';
+    }
+
+    return priority;
+  }
+
   return (
     <div className="project-card">
       <div className="project-card-header">
-        <div className="project-icon">
+        <div
+          className="project-icon"
+          style={{
+            backgroundColor: project.color || '#3B82F6',
+          }}>
           <MdFolder />
         </div>
 
-        <span className={`priority-badge ${project.priority.toLowerCase()}`}>
-          {project.priority}
+        <span
+          className={`priority-badge ${(
+            project.priority || 'medium'
+          ).toLowerCase()}`}>
+          {formatPriority(project.priority)}
         </span>
       </div>
 
-      <h3>{project.title}</h3>
+      <div className="project-info">
+        <h3>{project.title}</h3>
 
-      <p>{project.description}</p>
+        <p>{project.description || 'No description available.'}</p>
+      </div>
 
-      <div className="project-progress">
-        <div className="progress-top">
-          <span>Progress</span>
+      <div className="project-meta">
+        <span
+          className={`status-badge ${(
+            project.status || 'planning'
+          ).toLowerCase()}`}>
+          <MdCircle />
 
-          <span>{project.progress}%</span>
-        </div>
-
-        <div className="progress-bar">
-          <div
-            className="progress-fill"
-            style={{ width: `${project.progress}%` }}
-          />
-        </div>
+          {formatStatus(project.status)}
+        </span>
       </div>
 
       <div className="project-footer">
         <div>
-          <MdCheckCircle />
-
-          <span>{project.tasks} Tasks</span>
-        </div>
-
-        <div>
           <MdSchedule />
 
-          <span>{project.updated}</span>
+          <span>
+            Updated{' '}
+            {project.updated_at
+              ? new Date(project.updated_at).toLocaleDateString()
+              : 'Recently'}
+          </span>
         </div>
       </div>
     </div>

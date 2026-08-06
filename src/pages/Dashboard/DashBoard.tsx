@@ -1,5 +1,7 @@
 import './Dashboard.css';
 
+import { useEffect, useState } from 'react';
+
 import StatCard from './StatCard';
 import RecentProjects from './RecentProjects';
 import RecentTasks from './RecentTasks';
@@ -11,13 +13,22 @@ import {
   MdTrendingUp,
 } from 'react-icons/md';
 
+import type { Project } from '../../types/project';
+
+import { getProjects } from '../../services/project.service';
+
 function Dashboard() {
+  const [recentProjects, setRecentProjects] = useState<Project[]>([]);
+
   const currentDate = new Date();
 
   const formattedDate = currentDate.toLocaleDateString('en-US', {
     weekday: 'long',
+
     year: 'numeric',
+
     month: 'long',
+
     day: 'numeric',
   });
 
@@ -33,15 +44,28 @@ function Dashboard() {
     greeting = 'Good Evening';
   }
 
-  // Apenas ler o nome guardado
   const userName = localStorage.getItem('userName') ?? 'Developer';
+
+  useEffect(() => {
+    async function loadProjects() {
+      try {
+        const data = await getProjects();
+
+        setRecentProjects(data.projects);
+      } catch (error) {
+        console.error('Error loading dashboard projects:', error);
+      }
+    }
+
+    loadProjects();
+  }, []);
 
   return (
     <main className="dashboard">
       <section className="dashboard-welcome">
-        <div className="welcome-info">
+        <div className="welcome-content">
           <h1>
-            {greeting}, {userName} 
+            {greeting}, {userName}
           </h1>
 
           <p>Overview of your work</p>
@@ -58,34 +82,34 @@ function Dashboard() {
         <StatCard
           icon={<MdFolderOpen />}
           title="Projects"
-          value={12}
-          description="+2 this week"
+          value={recentProjects.length}
+          description="Total projects"
         />
 
         <StatCard
           icon={<MdTaskAlt />}
           title="Active Tasks"
-          value={34}
-          description="8 due today"
+          value={0}
+          description="Tasks pending"
         />
 
         <StatCard
           icon={<MdCheckCircle />}
           title="Completed"
-          value={128}
-          description="+15 this week"
+          value={0}
+          description="Completed tasks"
         />
 
         <StatCard
           icon={<MdTrendingUp />}
           title="Productivity"
-          value={92}
-          description="+4 this month"
+          value={0}
+          description="This month"
         />
       </section>
 
       <section className="dashboard-recent-projects">
-        <RecentProjects />
+        <RecentProjects projects={recentProjects} />
       </section>
 
       <section className="dashboard-recent-tasks">

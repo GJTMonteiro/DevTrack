@@ -1,104 +1,90 @@
 import './Projects.css';
 
+import { useEffect, useState } from 'react';
+
 import ProjectCard from '../Project/ProjectCard';
 
-interface Project {
-  id: number;
-  title: string;
-  description: string;
-  progress: number;
-  tasks: number;
-  priority: string;
-  updated: string;
-}
+import ProjectModal from '../../components/ProjectModal/ProjectModal';
 
-const projects: Project[] = [
-  {
-    id: 1,
-    title: 'DevTrack',
-    description: 'Developer productivity platform built with React, TypeScript and Node.js.',
-    progress: 78,
-    tasks: 24,
-    priority: 'High',
-    updated: '2 Aug 2026',
-  },
-  {
-    id: 2,
-    title: 'Portfolio',
-    description: 'Personal portfolio showcasing projects and skills.',
-    progress: 100,
-    tasks: 18,
-    priority: 'Low',
-    updated: '31 Jul 2026',
-  },
-  {
-    id: 3,
-    title: 'Coffee Shop',
-    description: 'Modern React website for a fictional coffee shop.',
-    progress: 62,
-    tasks: 15,
-    priority: 'Medium',
-    updated: '28 Jul 2026',
-  },
-];
+import { getProjects } from '../../services/project.service';
+
+import type { Project } from '../../types/project';
 
 function Projects() {
+  const [projects, setProjects] = useState<Project[]>([]);
+
+  const [showModal, setShowModal] = useState(false);
+
+  async function loadProjects() {
+    try {
+      const data = await getProjects();
+
+      setProjects(data.projects);
+    } catch (error) {
+      console.error('Error loading projects:', error);
+    }
+  }
+
+  useEffect(() => {
+    loadProjects();
+  }, []);
+
   return (
     <section className="projects-content">
-
       <div className="projects-header">
-
         <div>
           <h1>Projects</h1>
+
           <p>Manage all your projects in one place.</p>
         </div>
 
-        <button className="new-project-btn">
+        <button className="new-project-btn" onClick={() => setShowModal(true)}>
           + New Project
         </button>
-
       </div>
 
-
       <div className="projects-search">
-
-        <input
-          type="text"
-          placeholder="Search projects..."
-        />
+        <input type="text" placeholder="Search projects..." />
 
         <select className="projects-filter">
           <option>All Projects</option>
+
           <option>Active</option>
+
           <option>Completed</option>
+
           <option>Archived</option>
         </select>
 
         <select className="priority-filter">
           <option>All priorities</option>
+
           <option>Low</option>
+
           <option>Medium</option>
+
           <option>High</option>
         </select>
-
       </div>
-
 
       <div className="projects-container">
-
         <div className="projects-list">
-
-          {projects.map((project) => (
-            <ProjectCard
-              key={project.id}
-              project={project}
-            />
-          ))}
-
+          {projects.length === 0 ? (
+            <p className="no-projects">No projects created yet.</p>
+          ) : (
+            projects.map((project) => (
+              <ProjectCard key={project.id} project={project} />
+            ))
+          )}
         </div>
-
       </div>
 
+      {showModal && (
+        <ProjectModal
+          onClose={() => setShowModal(false)}
+          onCreated={loadProjects}
+        />
+      )}
     </section>
   );
 }
