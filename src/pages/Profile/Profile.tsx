@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 
 import StatCard from '../Dashboard/StatCard';
+
 import Avatar from '../../assets/stussy-night.jpeg';
 
 import './Profile.css';
@@ -14,6 +15,12 @@ import {
   MdTrendingUp,
 } from 'react-icons/md';
 
+import { useEffect, useState } from 'react';
+
+import { getProjects } from '../../services/project.service';
+
+import type { Project } from '../../types/project';
+
 const user = {
   name: localStorage.getItem('userName') ?? 'Developer',
 
@@ -23,6 +30,7 @@ const user = {
 
   location: {
     name: 'Japan',
+
     code: 'JP',
   },
 
@@ -37,9 +45,13 @@ const user = {
 
   actions: [
     { label: 'Edit Profile', action: 'edit' },
+
     { label: 'Change Password', action: 'password' },
+
     { label: 'Security', action: 'security' },
+
     { label: 'Notifications', action: 'notifications' },
+
     { label: 'Logout', action: 'logout' },
   ],
 };
@@ -64,12 +76,29 @@ const details = [
 function Profile() {
   const navigate = useNavigate();
 
+  const [projects, setProjects] = useState<Project[]>([]);
+
+  useEffect(() => {
+    async function loadProjects() {
+      try {
+        const data = await getProjects();
+
+        setProjects(data.projects);
+      } catch (error) {
+        console.error('Error loading projects:', error);
+      }
+    }
+
+    loadProjects();
+  }, []);
+
   function handleEditProfile() {
     console.log('Edit Profile');
   }
 
   function handleLogout() {
     localStorage.removeItem('token');
+
     localStorage.removeItem('userName');
 
     sessionStorage.removeItem('token');
@@ -81,18 +110,17 @@ function Profile() {
     <section className="profile-content">
       <div className="profile-header">
         <div className="profile-avatar">
-          <img src={Avatar} alt="Avatar" />
+          <img src={Avatar} alt="Profile avatar" />
         </div>
 
         <div className="profile-info">
           <h1 className="profile-name">
-            <span className="country-flag-wrapper">
-              <ReactCountryFlag
-                countryCode={user.location.code}
-                title={user.location.name}
-                className="country-flag"
-              />
-            </span>
+            <ReactCountryFlag
+              countryCode={user.location.code}
+              svg
+              title={user.location.name}
+              className="country-flag"
+            />
 
             <span>{user.name}</span>
           </h1>
@@ -126,29 +154,29 @@ function Profile() {
         <StatCard
           icon={<MdFolderOpen />}
           title="Projects"
-          value={12}
+          value={projects.length}
           description="Total Projects"
         />
 
         <StatCard
           icon={<MdTaskAlt />}
           title="Completed Tasks"
-          value={128}
+          value={0}
           description="All completed"
         />
 
         <StatCard
           icon={<MdCheckCircle />}
           title="Productivity"
-          value={92}
+          value={0}
           description="This month"
         />
 
         <StatCard
           icon={<MdTrendingUp />}
           title="Years Active"
-          value={2}
-          description="Since 2024"
+          value={0}
+          description="Since 2026"
         />
       </div>
 
