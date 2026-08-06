@@ -12,17 +12,52 @@ import {
 function Login() {
   const navigate = useNavigate();
 
-  function handleLogin() {
-    // Simula um login
-    localStorage.setItem('token', 'devtrack-token');
+  async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
 
-    // Apenas cria um nome por defeito se ainda não existir
-    if (!localStorage.getItem('userName')) {
-      localStorage.setItem('userName', 'Developer');
-      localStorage.setItem('username', 'developer');
+    const form = e.currentTarget;
+
+    const email = (form.elements.namedItem('email') as HTMLInputElement).value;
+
+    const password = (form.elements.namedItem('password') as HTMLInputElement)
+      .value;
+
+    try {
+      const response = await fetch('http://localhost:3000/api/auth/login', {
+        method: 'POST',
+
+        headers: {
+          'Content-Type': 'application/json',
+        },
+
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.message);
+
+        return;
+      }
+
+      // Guardar JWT
+      localStorage.setItem('token', data.token);
+
+      // Guardar dados do utilizador
+      localStorage.setItem('userName', data.user.name);
+
+      localStorage.setItem('username', data.user.username);
+
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('LOGIN ERROR:', error);
+
+      alert('Unable to connect to server');
     }
-
-    navigate('/dashboard');
   }
 
   return (
@@ -41,14 +76,17 @@ function Login() {
               <MdFolderOpen />
               <span>Project Management</span>
             </div>
+
             <div>
               <MdTaskAlt />
               <span>Task Tracking</span>
             </div>
+
             <div>
               <MdTrendingUp />
               <span>Productivity Dashboard</span>
             </div>
+
             <div>
               <MdPerson />
               <span>Profile Page</span>
@@ -63,12 +101,7 @@ function Login() {
             <p>Sign in to continue to DevTrack</p>
           </div>
 
-          <form
-            className="auth-form"
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleLogin();
-            }}>
+          <form className="auth-form" onSubmit={handleLogin}>
             <label htmlFor="email" className="sr-only">
               Email
             </label>

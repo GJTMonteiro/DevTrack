@@ -12,7 +12,7 @@ import {
 function Register() {
   const navigate = useNavigate();
 
-  function handleRegister(e: React.FormEvent<HTMLFormElement>) {
+  async function handleRegister(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     const form = e.currentTarget;
@@ -22,11 +22,54 @@ function Register() {
     const username = (form.elements.namedItem('username') as HTMLInputElement)
       .value;
 
-    localStorage.setItem('token', 'devtrack-token');
-    localStorage.setItem('userName', name);
-    localStorage.setItem('username', username);
+    const email = (form.elements.namedItem('email') as HTMLInputElement).value;
 
-    navigate('/dashboard');
+    const password = (form.elements.namedItem('password') as HTMLInputElement)
+      .value;
+
+    const confirmPassword = (
+      form.elements.namedItem('confirmPassword') as HTMLInputElement
+    ).value;
+
+    if (password !== confirmPassword) {
+      alert('Passwords do not match');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:3000/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name,
+          username,
+          email,
+          password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.message);
+        return;
+      }
+
+      // Guardar dados básicos do utilizador
+      localStorage.setItem('userName', data.user.name);
+
+      localStorage.setItem('username', data.user.username);
+
+      alert('Account created successfully!');
+
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('REGISTER ERROR:', error);
+
+      alert('Unable to connect to server');
+    }
   }
 
   return (

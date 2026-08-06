@@ -21,5 +21,5 @@
     "noFallthroughCasesInSwitch": true
   },
 
-  "include": ["src", "server/src/routes/task.routes.ts", "server/src/routes/user.routes.ts", "server/src/routes/auth.routes.ts", "server/src/routes/project.routes.ts"]
+  "include": ["src", "server/src/routes/task.routes.ts", "server/src/routes/user.routes.ts", "server/src/routes/authRoutes.ts", "server/src/routes/project.routes.ts"]
 }
