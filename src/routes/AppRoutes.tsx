@@ -1,19 +1,19 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from "react-router-dom";
 
-import DashboardLayout from '../layouts/DashBoardLayout/DashboardLayout';
+import DashboardLayout from "../layouts/DashBoardLayout/DashboardLayout";
 
-import Dashboard from '../pages/Dashboard/DashBoard';
-import Login from '../pages/Login/Login';
-import Register from '../pages/Register/Register';
-import Profile from '../pages/Profile/Profile';
-import Project from '../pages/Project/Project';
-import Projects from '../pages/Projects/Projects';
-import Settings from '../pages/Settings/Settings';
-import Tasks from '../pages/Tasks/Tasks';
-import ForgotPassword from '../pages/ForgotPassword/ForgotPassword';
+import Dashboard from "../pages/Dashboard/DashBoard";
+import Login from "../pages/Login/Login";
+import Register from "../pages/Register/Register";
+import Profile from "../pages/Profile/Profile";
+import Project from "../pages/Project/Project";
+import Projects from "../pages/Projects/Projects";
+import Settings from "../pages/Settings/Settings";
+import Tasks from "../pages/Tasks/Tasks";
+import ForgotPassword from "../pages/ForgotPassword/ForgotPassword";
 
-import PrivateRoute from './PrivateRoute';
-import PublicRoute from './PublicRoute';
+import PrivateRoute from "./PrivateRoute";
+import PublicRoute from "./PublicRoute";
 
 function AppRoutes() {
   return (
