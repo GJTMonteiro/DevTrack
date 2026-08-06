@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+
 import pool from "../config/database.js";
+
 
 export async function register(req: Request, res: Response) {
 
@@ -72,6 +75,88 @@ export async function register(req: Request, res: Response) {
     } catch (error) {
 
         console.error("REGISTER ERROR:", error);
+
+        res.status(500).json({
+            message: "Internal server error"
+        });
+    }
+}
+
+
+
+
+export async function login(req: Request, res: Response) {
+
+    try {
+
+        const { email, password } = req.body;
+
+
+        // Procurar utilizador pelo email
+        const result = await pool.query(
+            `
+            SELECT *
+            FROM users
+            WHERE email = $1
+            `,
+            [
+                email
+            ]
+        );
+
+
+        if (result.rows.length === 0) {
+            return res.status(400).json({
+                message: "Invalid email or password"
+            });
+        }
+
+
+        const user = result.rows[0];
+
+
+        // Comparar password
+        const passwordMatch = await bcrypt.compare(
+            password,
+            user.password_hash
+        );
+
+
+        if (!passwordMatch) {
+            return res.status(400).json({
+                message: "Invalid email or password"
+            });
+        }
+
+
+        // Criar JWT
+        const token = jwt.sign(
+            {
+                id: user.id,
+                email: user.email
+            },
+            process.env.JWT_SECRET as string,
+            {
+                expiresIn: "7d"
+            }
+        );
+
+
+        res.status(200).json({
+            message: "Login successful",
+            token,
+            user: {
+                id: user.id,
+                name: user.name,
+                username: user.username,
+                email: user.email
+            }
+        });
+
+
+    } catch (error) {
+
+        console.error("LOGIN ERROR:", error);
 
         res.status(500).json({
             message: "Internal server error"
