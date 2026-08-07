@@ -40,17 +40,31 @@ export async function getProjects(): Promise<ProjectsResponse> {
 
 export async function createProject(projectData: {
   title: string;
-
   description: string;
-
   color?: string;
-
   status?: string;
-
   priority?: string;
 }) {
   return await apiFetch('/projects', {
     method: 'POST',
+
+    body: JSON.stringify(projectData),
+  });
+}
+
+// UPDATE PROJECT
+export async function updateProject(
+  projectId: string,
+  projectData: {
+    title: string;
+    description: string;
+    color?: string;
+    status?: string;
+    priority?: string;
+  },
+) {
+  return await apiFetch(`/projects/${projectId}`, {
+    method: 'PUT',
 
     body: JSON.stringify(projectData),
   });

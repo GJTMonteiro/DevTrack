@@ -1,27 +1,43 @@
 import './ProjectModal.css';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import { createProject } from '../../services/project.service';
+import { createProject, updateProject } from '../../services/project.service';
+
+import type { Project } from '../../types/project';
 
 interface ProjectModalProps {
   onClose: () => void;
-
   onCreated: () => void;
+  project?: Project | null;
 }
 
-function ProjectModal({ onClose, onCreated }: ProjectModalProps) {
+function ProjectModal({ onClose, onCreated, project }: ProjectModalProps) {
+  const isEditing = Boolean(project);
+
   const [title, setTitle] = useState('');
-
   const [description, setDescription] = useState('');
-
   const [color, setColor] = useState('#3B82F6');
-
   const [status, setStatus] = useState('Planning');
-
   const [priority, setPriority] = useState('Medium');
 
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (project) {
+      setTitle(project.title ?? '');
+      setDescription(project.description ?? '');
+      setColor(project.color ?? '#3B82F6');
+      setStatus(project.status ?? 'Planning');
+      setPriority(project.priority ?? 'Medium');
+    } else {
+      setTitle('');
+      setDescription('');
+      setColor('#3B82F6');
+      setStatus('Planning');
+      setPriority('Medium');
+    }
+  }, [project]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -29,48 +45,36 @@ function ProjectModal({ onClose, onCreated }: ProjectModalProps) {
     try {
       setLoading(true);
 
-      await createProject({
+      const projectData = {
         title,
-
         description,
-
         color,
-
         status,
-
         priority,
-      });
+      };
 
-      // Atualiza lista de projetos
+      if (project) {
+        await updateProject(String(project.id), projectData);
+      } else {
+        await createProject(projectData);
+      }
 
       onCreated();
-
-      // Fecha modal
-
       onClose();
-
-      // Limpa formulário
-
-      setTitle('');
-
-      setDescription('');
-
-      setColor('#3B82F6');
-
-      setStatus('Planning');
-
-      setPriority('Medium');
     } catch (error) {
-      console.error('CREATE PROJECT ERROR:', error);
+      console.error(
+        project ? 'UPDATE PROJECT ERROR:' : 'CREATE PROJECT ERROR:',
+        error,
+      );
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="project-modal-overlay">
-      <div className="project-modal">
-        <h2>Create New Project</h2>
+    <div className="profile-modal-overlay">
+      <div className="profile-modal">
+        <h2>{isEditing ? 'Edit Project' : 'Create New Project'}</h2>
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
@@ -109,13 +113,10 @@ function ProjectModal({ onClose, onCreated }: ProjectModalProps) {
             <label>Status</label>
 
             <select value={status} onChange={(e) => setStatus(e.target.value)}>
-              <option>Planning</option>
-
-              <option>Active</option>
-
-              <option>Completed</option>
-
-              <option>Archived</option>
+              <option value="Planning">Planning</option>
+              <option value="Active">Active</option>
+              <option value="Completed">Completed</option>
+              <option value="Archived">Archived</option>
             </select>
           </div>
 
@@ -125,21 +126,25 @@ function ProjectModal({ onClose, onCreated }: ProjectModalProps) {
             <select
               value={priority}
               onChange={(e) => setPriority(e.target.value)}>
-              <option>Low</option>
-
-              <option>Medium</option>
-
-              <option>High</option>
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
             </select>
           </div>
 
           <div className="project-modal-actions">
-            <button type="button" onClick={onClose}>
+            <button type="button" onClick={onClose} disabled={loading}>
               Cancel
             </button>
 
             <button type="submit" disabled={loading}>
-              {loading ? 'Creating...' : 'Create'}
+              {loading
+                ? project
+                  ? 'Saving...'
+                  : 'Creating...'
+                : project
+                  ? 'Save Changes'
+                  : 'Create'}
             </button>
           </div>
         </form>

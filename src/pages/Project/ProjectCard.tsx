@@ -2,13 +2,15 @@ import './ProjectCard.css';
 
 import type { Project } from '../../types/project';
 
-import { MdFolder, MdSchedule, MdCircle } from 'react-icons/md';
+import { MdFolder, MdSchedule, MdCircle, MdEdit } from 'react-icons/md';
 
 interface ProjectCardProps {
   project: Project;
+
+  onEdit?: (project: Project) => void;
 }
 
-function ProjectCard({ project }: ProjectCardProps) {
+function ProjectCard({ project, onEdit }: ProjectCardProps) {
   function formatStatus(status?: string) {
     if (!status) {
       return 'Planning';
@@ -42,21 +44,12 @@ function ProjectCard({ project }: ProjectCardProps) {
 
   return (
     <div className="project-card">
-      <div className="project-card-header">
-        <div
-          className="project-icon"
-          style={{
-            backgroundColor: project.color || '#3B82F6',
-          }}>
-          <MdFolder />
-        </div>
-
-        <span
-          className={`priority-badge ${(
-            project.priority || 'medium'
-          ).toLowerCase()}`}>
-          {formatPriority(project.priority)}
-        </span>
+      <div
+        className="project-icon"
+        style={{
+          backgroundColor: project.color || '#3B82F6',
+        }}>
+        <MdFolder />
       </div>
 
       <div className="project-info">
@@ -66,6 +59,13 @@ function ProjectCard({ project }: ProjectCardProps) {
       </div>
 
       <div className="project-meta">
+        <span
+          className={`priority-badge ${(
+            project.priority || 'medium'
+          ).toLowerCase()}`}>
+          {formatPriority(project.priority)}
+        </span>
+
         <span
           className={`status-badge ${(
             project.status || 'planning'
@@ -87,6 +87,16 @@ function ProjectCard({ project }: ProjectCardProps) {
               : 'Recently'}
           </span>
         </div>
+
+        {onEdit && (
+          <button
+            type="button"
+            className="project-edit-btn"
+            onClick={() => onEdit(project)}>
+            <MdEdit />
+            Edit
+          </button>
+        )}
       </div>
     </div>
   );
