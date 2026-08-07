@@ -13,22 +13,22 @@ import {
   MdTrendingUp,
 } from 'react-icons/md';
 
-import type { Project } from '../../types/project';
-
 import { getProjects } from '../../services/project.service';
+import { getTasks } from '../../services/task.service';
+
+import type { Project } from '../../types/project';
+import type { Task } from '../../types/task';
 
 function Dashboard() {
   const [recentProjects, setRecentProjects] = useState<Project[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
 
   const currentDate = new Date();
 
   const formattedDate = currentDate.toLocaleDateString('en-US', {
     weekday: 'long',
-
     year: 'numeric',
-
     month: 'long',
-
     day: 'numeric',
   });
 
@@ -47,18 +47,33 @@ function Dashboard() {
   const userName = localStorage.getItem('userName') ?? 'Developer';
 
   useEffect(() => {
-    async function loadProjects() {
+    async function loadData() {
       try {
-        const data = await getProjects();
+        const [projectsData, tasksData] = await Promise.all([
+          getProjects(),
+          getTasks(),
+        ]);
 
-        setRecentProjects(data.projects);
+        setRecentProjects(projectsData.projects);
+        setTasks(tasksData.tasks);
       } catch (error) {
-        console.error('Error loading dashboard projects:', error);
+        console.error('Error loading dashboard:', error);
       }
     }
 
-    loadProjects();
+    loadData();
   }, []);
+
+  const activeTasks = tasks.filter(
+    (task) => task.status !== 'Completed',
+  ).length;
+
+  const completedTasks = tasks.filter(
+    (task) => task.status === 'Completed',
+  ).length;
+
+  const productivity =
+    tasks.length === 0 ? 0 : Math.round((completedTasks / tasks.length) * 100);
 
   return (
     <main className="dashboard">
@@ -89,22 +104,22 @@ function Dashboard() {
         <StatCard
           icon={<MdTaskAlt />}
           title="Active Tasks"
-          value={0}
+          value={activeTasks}
           description="Tasks pending"
         />
 
         <StatCard
           icon={<MdCheckCircle />}
           title="Completed"
-          value={0}
+          value={completedTasks}
           description="Completed tasks"
         />
 
         <StatCard
           icon={<MdTrendingUp />}
           title="Productivity"
-          value={0}
-          description="This month"
+          value={`${productivity}%`}
+          description="Task completion"
         />
       </section>
 

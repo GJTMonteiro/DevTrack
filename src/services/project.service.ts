@@ -12,14 +12,14 @@ export async function getProjects(): Promise<ProjectsResponse> {
   const projects = Array.isArray(data) ? data : data.projects;
 
   return {
-    projects: projects.map((project: any) => ({
+    projects: projects.map((project: Project) => ({
       id: project.id,
 
       title: project.title,
 
       description: project.description ?? '',
 
-      color: project.color ?? '#3b82f6',
+      color: project.color ?? '#3B82F6',
 
       status: project.status ?? 'Planning',
 

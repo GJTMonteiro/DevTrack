@@ -1,95 +1,137 @@
 import './Tasks.css';
-import TaskCard from '../../components/Task/TaskCard';
 
-interface Task {
-  id: number;
-  title: string;
-  description: string;
-  status: string;
-  priority: string;
-  dueDate: string;
-}
+import { useEffect, useState } from 'react';
 
-const tasks: Task[] = [
-  {
-    id: 1,
-    title: 'Create DevTrack',
-    description: 'Develop the app',
-    status: 'Completed',
-    priority: 'High',
-    dueDate: '15 Aug 2026',
-  },
-  {
-    id: 2,
-    title: 'Get in Shape',
-    description: 'Achieve the best shape possible',
-    status: 'In Progress',
-    priority: 'High',
-    dueDate: 'No deadline',
-  },
-  {
-    id: 3,
-    title: 'Buy a House',
-    description: 'Buy the land and build the dream house',
-    status: 'In Progress',
-    priority: 'High',
-    dueDate: 'No deadline',
-  },
-];
+import { getTasks, deleteTask } from '../../services/task.service';
+
+import type { Task } from '../../types/task';
+
+import TaskModal from '../../components/TaskModal/TaskModal';
 
 function Tasks() {
-  return (
-    <section className="task-content">
+  const [tasks, setTasks] = useState<Task[]>([]);
 
-      <div className="task-header">
+  const [loading, setLoading] = useState(true);
+
+  const [showModal, setShowModal] = useState(false);
+
+  const [selectedTask, setSelectedTask] = useState<Task | undefined>();
+
+  async function loadTasks() {
+    try {
+      const response = await getTasks();
+
+      console.log('TASKS RESPONSE:', response);
+
+      setTasks(response.tasks);
+    } catch (error) {
+      console.error('LOAD TASKS ERROR:', error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleDeleteTask(id: number) {
+    const confirmDelete = window.confirm(
+      'Are you sure you want to delete this task?',
+    );
+
+    if (!confirmDelete) {
+      return;
+    }
+
+    try {
+      await deleteTask(id);
+
+      loadTasks();
+    } catch (error) {
+      console.error('DELETE TASK ERROR:', error);
+    }
+  }
+
+  function handleEditTask(task: Task) {
+    setSelectedTask(task);
+
+    setShowModal(true);
+  }
+
+  function handleCreateTask() {
+    setSelectedTask(undefined);
+
+    setShowModal(true);
+  }
+
+  useEffect(() => {
+    loadTasks();
+  }, []);
+
+  if (loading) {
+    return <p>Loading tasks...</p>;
+  }
+
+  return (
+    <section className="tasks-page">
+      <div className="tasks-header">
         <div>
           <h1>Tasks</h1>
-          <p>Manage all your tasks in one place.</p>
+
+          <p>Manage your tasks and track your productivity.</p>
         </div>
 
-        <button className="new-task-btn">
+        <button className="new-task-btn" onClick={handleCreateTask}>
           + New Task
         </button>
       </div>
 
-
-      <div className="tasks-search">
-
-        <input
-          type="text"
-          placeholder="Search tasks..."
-        />
-
-        <select className="tasks-filter">
-          <option>All Status</option>
-          <option>To Do</option>
-          <option>In Progress</option>
-          <option>Completed</option>
-        </select>
-
-        <select className="priority-filter">
-          <option>All priorities</option>
-          <option>Low</option>
-          <option>Medium</option>
-          <option>High</option>
-        </select>
-
-      </div>
-
-
       <div className="tasks-container">
-        <div className="tasks-list">
+        {tasks.length === 0 ? (
+          <p className="no-tasks">No tasks created yet.</p>
+        ) : (
+          tasks.map((task) => (
+            <div className="task-card" key={task.id}>
+              <div>
+                <h3>{task.title}</h3>
 
-          {tasks.map((task) => (
-            <TaskCard
-              key={task.id}
-              task={task}
-            />
-          ))}
+                <p>{task.description}</p>
 
-        </div>
+                {task.project_name && (
+                  <small>Project: {task.project_name}</small>
+                )}
+              </div>
+
+              <div className="task-meta">
+                <span>{task.status}</span>
+
+                <span>{task.priority}</span>
+
+                <button
+                  className="edit-task-btn"
+                  onClick={() => handleEditTask(task)}>
+                  Edit
+                </button>
+
+                <button
+                  className="delete-task-btn"
+                  onClick={() => handleDeleteTask(task.id)}>
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
+      {showModal && (
+        <TaskModal
+          task={selectedTask}
+          onClose={() => {
+            setShowModal(false);
+
+            setSelectedTask(undefined);
+          }}
+          onCreated={loadTasks}
+        />
+      )}
     </section>
   );
 }

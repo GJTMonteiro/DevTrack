@@ -19,6 +19,8 @@ function Projects() {
     try {
       const data = await getProjects();
 
+      console.log('PROJECTS RESPONSE:', data);
+
       setProjects(data.projects);
     } catch (error) {
       console.error('Error loading projects:', error);

@@ -41,9 +41,25 @@ function ProjectModal({ onClose, onCreated }: ProjectModalProps) {
         priority,
       });
 
+      // Atualiza lista de projetos
+
       onCreated();
 
+      // Fecha modal
+
       onClose();
+
+      // Limpa formulário
+
+      setTitle('');
+
+      setDescription('');
+
+      setColor('#3B82F6');
+
+      setStatus('Planning');
+
+      setPriority('Medium');
     } catch (error) {
       console.error('CREATE PROJECT ERROR:', error);
     } finally {

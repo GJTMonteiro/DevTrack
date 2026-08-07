@@ -1,21 +1,19 @@
-export interface Project {
+export interface Task {
   id: number;
+
+  project_id: number;
+
+  project_name?: string;
 
   title: string;
 
   description: string;
 
-  progress: number;
-
-  tasks?: number;
+  status: string;
 
   priority: string;
 
-  updated: string;
-
-  color: string;
-
-  status: string;
+  due_date: string | null;
 
   created_at: string;
 

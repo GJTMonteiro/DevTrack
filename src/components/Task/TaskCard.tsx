@@ -2,6 +2,7 @@ import './TaskCard.css';
 
 import { useState } from 'react';
 
+import type { Task } from '../../types/task';
 import {
   MdPriorityHigh,
   MdRemove,
@@ -14,15 +15,6 @@ import {
   MdVisibility,
   MdDelete,
 } from 'react-icons/md';
-
-interface Task {
-  id: number;
-  title: string;
-  description: string;
-  status: string;
-  priority: string;
-  dueDate: string;
-}
 
 interface TaskCardProps {
   task: Task;
@@ -114,7 +106,7 @@ function TaskCard({ task }: TaskCardProps) {
           <span>{task.status}</span>
         </div>
 
-        <div className="task-due-date">{task.dueDate}</div>
+        <div className="task-due-date">{task.due_date ?? 'No deadline'}</div>
       </div>
     </div>
   );

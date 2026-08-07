@@ -1,31 +1,31 @@
-import { MdCheckCircle, MdAccessTime, MdPriorityHigh } from 'react-icons/md';
-
 import './RecentTasks.css';
 
-const tasks = [
-  {
-    title: 'Create authentication system',
-    project: 'DevTrack',
-    status: 'Completed',
-    priority: 'High',
-  },
+import { useEffect, useState } from 'react';
 
-  {
-    title: 'Design dashboard layout',
-    project: 'DevTrack',
-    status: 'In Progress',
-    priority: 'Medium',
-  },
+import { MdCheckCircle, MdAccessTime, MdPriorityHigh } from 'react-icons/md';
 
-  {
-    title: 'Fix responsive issues',
-    project: 'Portfolio',
-    status: 'To Do',
-    priority: 'Low',
-  },
-];
+import { getTasks } from '../../services/task.service';
+
+import type { Task } from '../../types/task';
 
 function RecentTasks() {
+  const [tasks, setTasks] = useState<Task[]>([]);
+
+  useEffect(() => {
+    async function loadTasks() {
+      try {
+        const data = await getTasks();
+
+        // Apenas as 5 tarefas mais recentes
+        setTasks(data.tasks.slice(0, 5));
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    loadTasks();
+  }, []);
+
   return (
     <div className="recent-tasks">
       <div className="recent-tasks-header">
@@ -35,37 +35,44 @@ function RecentTasks() {
       </div>
 
       <div className="recent-tasks-list">
-        {tasks.map((task) => (
-          <div className="recent-task-card" key={task.title}>
-            <div className="recent-task-info">
-              <h3>{task.title}</h3>
+        {tasks.length === 0 ? (
+          <p>No tasks yet.</p>
+        ) : (
+          tasks.map((task) => (
+            <div className="recent-task-card" key={task.id}>
+              <div className="recent-task-info">
+                <h3>{task.title}</h3>
 
-              <p>{task.project}</p>
+                <p>{task.project_name}</p>
+              </div>
+
+              <div className="recent-task-meta">
+                <span
+                  className={`task-status ${task.status
+                    .replace(' ', '-')
+                    .toLowerCase()}`}>
+                  {task.status === 'Completed' ? (
+                    <MdCheckCircle />
+                  ) : task.status === 'In Progress' ? (
+                    <MdAccessTime />
+                  ) : (
+                    <MdPriorityHigh />
+                  )}
+
+                  {task.status}
+                </span>
+
+                <span
+                  className={`task-priority ${task.priority.toLowerCase()}`}>
+                  {task.priority}
+                </span>
+              </div>
             </div>
-
-            <div className="recent-task-meta">
-              <span
-                className={`task-status ${task.status.replace(' ', '-').toLowerCase()}`}>
-                {task.status === 'Completed' ? (
-                  <MdCheckCircle />
-                ) : task.status === 'In Progress' ? (
-                  <MdAccessTime />
-                ) : (
-                  <MdPriorityHigh />
-                )}
-
-                {task.status}
-              </span>
-
-              <span className={`task-priority ${task.priority.toLowerCase()}`}>
-                {task.priority}
-              </span>
-            </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );
 }
 
-export default RecentTasks; 
+export default RecentTasks;
