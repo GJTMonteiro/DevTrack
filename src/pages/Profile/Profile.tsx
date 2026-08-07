@@ -1,10 +1,11 @@
 import { useNavigate } from 'react-router-dom';
-
-import StatCard from '../Dashboard/StatCard';
-
-import Avatar from '../../assets/stussy-night.jpeg';
+import { useEffect, useState } from 'react';
 
 import './Profile.css';
+
+import ProfileModal from '../../components/ProfileModal/ProfileModal';
+
+import Avatar from '../../assets/stussy-night.jpeg';
 
 import ReactCountryFlag from 'react-country-flag';
 
@@ -15,70 +16,35 @@ import {
   MdTrendingUp,
 } from 'react-icons/md';
 
-import { useEffect, useState } from 'react';
+import StatCard from '../Dashboard/StatCard';
 
 import { getProjects } from '../../services/project.service';
+import { getProfile, type ProfileData } from '../../services/profile.service';
 
 import type { Project } from '../../types/project';
 
-const user = {
-  name: localStorage.getItem('userName') ?? 'Developer',
-
-  role: 'Front & Back Developer',
-
-  email: 'xxxxxxxxx@gmail.com',
-
-  location: {
-    name: 'Japan',
-
-    code: 'JP',
-  },
-
-  skills: ['React', 'TypeScript', 'Git', 'Node.js', 'Express'],
-
-  activity: [
-    'Created DevTrack',
-    'Completed 8 tasks',
-    'Updated profile',
-    'Joined workspace',
-  ],
-
-  actions: [
-    { label: 'Edit Profile', action: 'edit' },
-
-    { label: 'Change Password', action: 'password' },
-
-    { label: 'Security', action: 'security' },
-
-    { label: 'Notifications', action: 'notifications' },
-
-    { label: 'Logout', action: 'logout' },
-  ],
-};
-
-const details = [
-  {
-    label: 'Username',
-    value: 'GJTMonteiro',
-  },
-
-  {
-    label: 'Country',
-    value: user.location.name,
-  },
-
-  {
-    label: 'Member Since',
-    value: 'August 2026',
-  },
-];
+import Skills from '../../components/Skills/Skills';
 
 function Profile() {
   const navigate = useNavigate();
 
   const [projects, setProjects] = useState<Project[]>([]);
 
+  const [profile, setProfile] = useState<ProfileData | null>(null);
+
+  const [showProfileModal, setShowProfileModal] = useState(false);
+
   useEffect(() => {
+    async function loadProfile() {
+      try {
+        const data = await getProfile();
+
+        setProfile(data);
+      } catch (error) {
+        console.error('Error loading profile:', error);
+      }
+    }
+
     async function loadProjects() {
       try {
         const data = await getProjects();
@@ -89,16 +55,18 @@ function Profile() {
       }
     }
 
+    loadProfile();
+
     loadProjects();
   }, []);
 
   function handleEditProfile() {
-    console.log('Edit Profile');
+    setShowProfileModal(true);
   }
 
   function handleLogout() {
     localStorage.removeItem('token');
-
+    localStorage.removeItem('user');
     localStorage.removeItem('userName');
 
     sessionStorage.removeItem('token');
@@ -106,28 +74,53 @@ function Profile() {
     navigate('/login');
   }
 
+  if (!profile) {
+    return <div className="profile-loading">Loading profile...</div>;
+  }
+
+  const details = [
+    {
+      label: 'Username',
+      value: profile.username,
+    },
+
+    {
+      label: 'Country',
+      value: profile.country,
+    },
+
+    {
+      label: 'Member Since',
+      value: 'August 2026',
+    },
+  ];
+
+  console.log(profile.country_code);
+
   return (
     <section className="profile-content">
       <div className="profile-header">
-        <div className="profile-avatar">
-          <img src={Avatar} alt="Profile avatar" />
-        </div>
+        <img src={Avatar} alt="Profile avatar" className="profile-avatar" />
 
         <div className="profile-info">
           <h1 className="profile-name">
-            <ReactCountryFlag
-              countryCode={user.location.code}
-              svg
-              title={user.location.name}
-              className="country-flag"
-            />
+            {profile.country_code && (
+              <div className="country-flag-wrapper">
+                <ReactCountryFlag
+                  countryCode={profile.country_code}
+                  svg
+                  title={profile.country}
+                  className="country-flag"
+                />
+              </div>
+            )}
 
-            <span>{user.name}</span>
+            <span>{profile.name}</span>
           </h1>
 
-          <p className="profile-role">{user.role}</p>
+          <p className="profile-role">{profile.role}</p>
 
-          <p className="profile-email">{user.email}</p>
+          <p className="profile-email">{profile.email}</p>
         </div>
 
         <button
@@ -180,25 +173,19 @@ function Profile() {
         />
       </div>
 
-      <div className="profile-skills">
-        <h2>Skills</h2>
-
-        <div className="skills-list">
-          {user.skills.map((skill) => (
-            <span className="skill-badge" key={skill}>
-              {skill}
-            </span>
-          ))}
-        </div>
-      </div>
+      <Skills />
 
       <div className="profile-activity">
         <h2>Recent Activity</h2>
 
         <ul>
-          {user.activity.map((activity) => (
-            <li key={activity}>{activity}</li>
-          ))}
+          <li>Created DevTrack</li>
+
+          <li>Completed 8 tasks</li>
+
+          <li>Updated profile</li>
+
+          <li>Joined workspace</li>
         </ul>
       </div>
 
@@ -206,21 +193,33 @@ function Profile() {
         <h2>Account</h2>
 
         <ul>
-          {user.actions.map((action) => (
-            <li key={action.action}>
-              <button
-                type="button"
-                onClick={() => {
-                  if (action.action === 'logout') {
-                    handleLogout();
-                  }
-                }}>
-                {action.label}
-              </button>
-            </li>
-          ))}
+          <li>
+            <button type="button" onClick={handleEditProfile}>
+              Edit Profile
+            </button>
+          </li>
+
+          <li>
+            <button>Change Password</button>
+          </li>
+
+          <li>
+            <button>Security</button>
+          </li>
+
+          <li>
+            <button>Notifications</button>
+          </li>
+
+          <li>
+            <button onClick={handleLogout}>Logout</button>
+          </li>
         </ul>
       </div>
+
+      {showProfileModal && (
+        <ProfileModal onClose={() => setShowProfileModal(false)} />
+      )}
     </section>
   );
 }
