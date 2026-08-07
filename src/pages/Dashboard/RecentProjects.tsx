@@ -6,9 +6,18 @@ import type { Project } from '../../types/project';
 
 interface RecentProjectsProps {
   projects: Project[];
+  loading: boolean;
 }
 
-function RecentProjects({ projects }: RecentProjectsProps) {
+function RecentProjects({ projects, loading }: RecentProjectsProps) {
+  if (loading) {
+    return <p className="projects-message">Loading projects...</p>;
+  }
+
+  if (!projects.length) {
+    return <p className="projects-message">No projects yet.</p>;
+  }
+
   return (
     <section className="recent-projects">
       <div className="recent-projects-header">

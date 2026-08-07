@@ -56,3 +56,23 @@
   color: white;
   border: none;
 }
+
+.country-preview {
+  margin-top: 10px;
+
+  display: flex;
+  align-items: center;
+}
+
+
+.country-preview img {
+  width: 34px;
+  height: 24px;
+
+  object-fit: cover;
+
+  border-radius: 4px;
+
+  border: 1px solid var(--color-border);
+}
+

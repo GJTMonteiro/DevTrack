@@ -61,6 +61,7 @@ function Profile() {
   }, []);
 
   function handleEditProfile() {
+    console.log('EDIT CLICK');
     setShowProfileModal(true);
   }
 
@@ -75,7 +76,7 @@ function Profile() {
   }
 
   if (!profile) {
-    return <div className="profile-loading">Loading profile...</div>;
+    return <p>Loading profile...</p>;
   }
 
   const details = [
@@ -94,8 +95,6 @@ function Profile() {
       value: 'August 2026',
     },
   ];
-
-  console.log(profile.country_code);
 
   return (
     <section className="profile-content">

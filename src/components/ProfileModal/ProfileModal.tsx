@@ -77,59 +77,72 @@ function ProfileModal({ onClose }: ProfileModalProps) {
   }
 
   return (
-    <div>
-      <form onSubmit={handleSave}>
-        <div className="form-group">
-          <label>Name</label>
+    <div className="profile-modal-overlay">
+      <div className="profile-modal">
+        <h2>Edit Profile</h2>
 
-          <input value={name} onChange={(e) => setName(e.target.value)} />
-        </div>
+        <form onSubmit={handleSave}>
+          <div className="form-group">
+            <label>Name</label>
 
-        <div className="form-group">
-          <label>Username</label>
+            <input value={name} onChange={(e) => setName(e.target.value)} />
+          </div>
 
-          <input
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-        </div>
+          <div className="form-group">
+            <label>Username</label>
 
-        <div className="form-group">
-          <label>Email</label>
+            <input
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </div>
 
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
+          <div className="form-group">
+            <label>Email</label>
 
-        <div className="form-group">
-          <label>Role</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
 
-          <input value={role} onChange={(e) => setRole(e.target.value)} />
-        </div>
+          <div className="form-group">
+            <label>Role</label>
 
-        <div className="form-group">
-          <label>Country</label>
+            <input value={role} onChange={(e) => setRole(e.target.value)} />
+          </div>
 
-          <input
-            autoComplete="off"
-            value={country}
-            onChange={(e) => setCountry(e.target.value)}
-          />
-        </div>
+          <div className="form-group">
+            <label>Country</label>
 
-        <div className="profile-modal-actions">
-          <button type="button" onClick={onClose}>
-            Cancel
-          </button>
+            <input
+              autoComplete="off"
+              value={country}
+              onChange={(e) => setCountry(e.target.value)}
+            />
 
-          <button type="submit" disabled={loading}>
-            {loading ? 'Saving...' : 'Save Changes'}
-          </button>
-        </div>
-      </form>
+            {country_code && (
+              <div className="country-preview">
+                <img
+                  src={`https://flagcdn.com/w40/${country_code.toLowerCase()}.png`}
+                  alt={country}
+                />
+              </div>
+            )}
+          </div>
+
+          <div className="profile-modal-actions">
+            <button type="button" onClick={onClose}>
+              Cancel
+            </button>
+
+            <button type="submit" disabled={loading}>
+              {loading ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

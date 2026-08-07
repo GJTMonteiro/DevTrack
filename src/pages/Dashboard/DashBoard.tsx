@@ -23,6 +23,8 @@ function Dashboard() {
   const [recentProjects, setRecentProjects] = useState<Project[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
 
+  const [loadingProjects, setLoadingProjects] = useState(true);
+
   const currentDate = new Date();
 
   const formattedDate = currentDate.toLocaleDateString('en-US', {
@@ -55,9 +57,12 @@ function Dashboard() {
         ]);
 
         setRecentProjects(projectsData.projects);
+
         setTasks(tasksData.tasks);
       } catch (error) {
         console.error('Error loading dashboard:', error);
+      } finally {
+        setLoadingProjects(false);
       }
     }
 
@@ -78,7 +83,7 @@ function Dashboard() {
   return (
     <main className="dashboard">
       <section className="dashboard-welcome">
-        <div className="welcome-content">
+        <div className="welcome-info">
           <h1>
             {greeting}, {userName}
           </h1>
@@ -124,7 +129,7 @@ function Dashboard() {
       </section>
 
       <section className="dashboard-recent-projects">
-        <RecentProjects projects={recentProjects} />
+        <RecentProjects projects={recentProjects} loading={loadingProjects} />
       </section>
 
       <section className="dashboard-recent-tasks">
