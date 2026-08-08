@@ -10,6 +10,8 @@ import {
 
 import type { Skill } from '../../types/skill';
 
+import { availableSkills } from '../../utils/skills';
+
 function Skills() {
   const [skills, setSkills] = useState<Skill[]>([]);
   const [newSkill, setNewSkill] = useState('');
@@ -29,19 +31,30 @@ function Skills() {
     loadSkills();
   }, []);
 
-  async function handleAddSkill() {
-    if (!newSkill.trim()) {
+  async function handleAddSkill(skillName?: string) {
+    const skillToAdd = skillName ?? newSkill;
+
+    if (!skillToAdd.trim()) {
+      return;
+    }
+
+    const alreadyExists = skills.some(
+      (skill) => skill.skill.toLowerCase() === skillToAdd.toLowerCase(),
+    );
+
+    if (alreadyExists) {
+      setNewSkill('');
       return;
     }
 
     try {
       setLoading(true);
 
-      await createSkill(newSkill);
+      await createSkill(skillToAdd);
 
       setNewSkill('');
 
-      loadSkills();
+      await loadSkills();
     } catch (error) {
       console.error('CREATE SKILL ERROR:', error);
     } finally {
@@ -59,7 +72,7 @@ function Skills() {
     try {
       await deleteSkill(id);
 
-      loadSkills();
+      await loadSkills();
     } catch (error) {
       console.error('DELETE SKILL ERROR:', error);
     }
@@ -72,20 +85,25 @@ function Skills() {
       </div>
 
       <div className="skills-add">
-        <input
-          type="text"
-          placeholder="Add a skill..."
-          value={newSkill}
-          onChange={(e) => setNewSkill(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              handleAddSkill();
-            }
-          }}
-        />
+        <div className="skills-select-wrapper">
+          <select
+            value={newSkill}
+            onChange={(e) => setNewSkill(e.target.value)}
+            disabled={loading}>
+            <option value="">Select a skill...</option>
 
-        <button onClick={handleAddSkill} disabled={loading}>
+            {availableSkills.map((skill) => (
+              <option key={skill} value={skill}>
+                {skill}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => handleAddSkill()}
+          disabled={loading || !newSkill}>
           {loading ? 'Adding...' : '+ Add'}
         </button>
       </div>
@@ -99,6 +117,7 @@ function Skills() {
               <span>{skill.skill}</span>
 
               <button
+                type="button"
                 className="delete-skill-btn"
                 onClick={() => handleDeleteSkill(skill.id)}>
                 ✕
