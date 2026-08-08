@@ -1,42 +1,56 @@
-import apiFetch from './api';
-
 import type { Project } from '../types/project';
+
+const API_URL = 'http://localhost:3000/api/projects';
 
 interface ProjectsResponse {
   projects: Project[];
 }
 
-export async function getProjects(): Promise<ProjectsResponse> {
-  const data = await apiFetch('/projects');
-
-  const projects = Array.isArray(data) ? data : data.projects;
-
-  return {
-    projects: projects.map((project: Project) => ({
-      id: project.id,
-
-      title: project.title,
-
-      description: project.description ?? '',
-
-      color: project.color ?? '#3B82F6',
-
-      status: project.status ?? 'Planning',
-
-      priority: project.priority ?? 'Medium',
-
-      progress: project.progress ?? 0,
-
-      tasks: project.tasks ?? 0,
-
-      created_at: project.created_at,
-
-      updated_at: project.updated_at,
-
-      updated: project.updated ?? project.updated_at,
-    })),
-  };
+interface CreateProjectResponse {
+  message: string;
+  project: Project;
 }
+
+interface UpdateProjectResponse {
+  project: Project;
+}
+
+interface ErrorResponse {
+  message?: string;
+}
+
+// ==========================
+// GET PROJECTS
+// ==========================
+
+export async function getProjects(): Promise<ProjectsResponse> {
+  const token = localStorage.getItem('token');
+
+  const response = await fetch(API_URL, {
+    method: 'GET',
+
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+
+  const data = (await response.json()) as ProjectsResponse | ErrorResponse;
+
+  if (!response.ok) {
+    throw new Error(
+      'message' in data && data.message
+        ? data.message
+        : 'Failed to fetch projects',
+    );
+  }
+
+  return data as ProjectsResponse;
+}
+
+// ==========================
+// CREATE PROJECT
+// ==========================
 
 export async function createProject(projectData: {
   title: string;
@@ -44,17 +58,39 @@ export async function createProject(projectData: {
   color?: string;
   status?: string;
   priority?: string;
-}) {
-  return await apiFetch('/projects', {
+}): Promise<CreateProjectResponse> {
+  const token = localStorage.getItem('token');
+
+  const response = await fetch(API_URL, {
     method: 'POST',
+
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
 
     body: JSON.stringify(projectData),
   });
+
+  const data = (await response.json()) as CreateProjectResponse | ErrorResponse;
+
+  if (!response.ok) {
+    throw new Error(
+      'message' in data && data.message
+        ? data.message
+        : 'Failed to create project',
+    );
+  }
+
+  return data as CreateProjectResponse;
 }
 
+// ==========================
 // UPDATE PROJECT
+// ==========================
+
 export async function updateProject(
-  projectId: string,
+  projectId: number,
   projectData: {
     title: string;
     description: string;
@@ -62,10 +98,60 @@ export async function updateProject(
     status?: string;
     priority?: string;
   },
-) {
-  return await apiFetch(`/projects/${projectId}`, {
+): Promise<UpdateProjectResponse> {
+  const token = localStorage.getItem('token');
+
+  const response = await fetch(`${API_URL}/${projectId}`, {
     method: 'PUT',
+
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
 
     body: JSON.stringify(projectData),
   });
+
+  const data = (await response.json()) as UpdateProjectResponse | ErrorResponse;
+
+  if (!response.ok) {
+    throw new Error(
+      'message' in data && data.message
+        ? data.message
+        : 'Failed to update project',
+    );
+  }
+
+  return data as UpdateProjectResponse;
+}
+
+// ==========================
+// DELETE PROJECT
+// ==========================
+
+export async function deleteProject(
+  projectId: number,
+): Promise<{ message: string }> {
+  const token = localStorage.getItem('token');
+
+  const response = await fetch(`${API_URL}/${projectId}`, {
+    method: 'DELETE',
+
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+
+  const data = (await response.json()) as { message: string } | ErrorResponse;
+
+  if (!response.ok) {
+    throw new Error(
+      'message' in data && data.message
+        ? data.message
+        : 'Failed to delete project',
+    );
+  }
+
+  return data as { message: string };
 }

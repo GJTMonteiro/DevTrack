@@ -79,8 +79,7 @@
 }
 
 .navbar-notifications,
-.navbar-dark-mode,
-.navbar-avatar {
+.navbar-dark-mode {
     width: 45px;
     height: 45px;
 
@@ -105,14 +104,12 @@
 }
 
 .navbar-notifications:hover,
-.navbar-dark-mode:hover,
-.navbar-avatar:hover {
+.navbar-dark-mode:hover {
     background: rgba(59, 130, 246, 0.15);
     color: var(--color-primary);
 }
 
 .navbar-notifications svg,
-.navbar-dark-mode svg,
-.navbar-avatar svg {
+.navbar-dark-mode svg {
     font-size: 1.35rem;
 }

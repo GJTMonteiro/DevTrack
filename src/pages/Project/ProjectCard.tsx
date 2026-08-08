@@ -1,102 +1,147 @@
 import './ProjectCard.css';
 
-import type { Project } from '../../types/project';
+import { useState } from 'react';
 
-import { MdFolder, MdSchedule, MdCircle, MdEdit } from 'react-icons/md';
+import {
+  MdFolder,
+  MdMoreVert,
+  MdCheckCircle,
+  MdSchedule,
+  MdEdit,
+  MdDelete,
+} from 'react-icons/md';
+
+import type { Project } from '../../types/project';
 
 interface ProjectCardProps {
   project: Project;
 
-  onEdit?: (project: Project) => void;
+  onEdit: (project: Project) => void;
+
+  onDelete: (projectId: number) => void;
 }
 
-function ProjectCard({ project, onEdit }: ProjectCardProps) {
-  function formatStatus(status?: string) {
-    if (!status) {
-      return 'Planning';
-    }
+function ProjectCard({ project, onEdit, onDelete }: ProjectCardProps) {
+  const [menuOpen, setMenuOpen] = useState(false);
 
-    switch (status.toLowerCase()) {
-      case 'active':
-        return 'Active';
-
-      case 'completed':
-        return 'Completed';
-
-      case 'archived':
-        return 'Archived';
-
-      case 'planning':
-        return 'Planning';
-
-      default:
-        return status;
-    }
-  }
-
-  function formatPriority(priority?: string) {
-    if (!priority) {
-      return 'Medium';
-    }
-
-    return priority;
-  }
+  const priority = project.priority ?? 'Medium';
 
   return (
     <div className="project-card">
-      <div
-        className="project-icon"
-        style={{
-          backgroundColor: project.color || '#3B82F6',
-        }}>
-        <MdFolder />
+      {/* ==========================
+          HEADER
+      ========================== */}
+
+      <div className="project-top">
+        <div className="project-title">
+          <div
+            className="project-icon"
+            style={{
+              backgroundColor: project.color || '#3B82F6',
+            }}>
+            <MdFolder />
+          </div>
+
+          <h3>{project.title}</h3>
+        </div>
+
+        {/* ==========================
+            PROJECT MENU
+        ========================== */}
+
+        <div className="project-menu-wrapper">
+          <button
+            type="button"
+            className="project-menu"
+            aria-label="Project options"
+            onClick={() => setMenuOpen((previous) => !previous)}>
+            <MdMoreVert />
+          </button>
+
+          {menuOpen && (
+            <div className="project-menu-dropdown">
+              <button
+                type="button"
+                onClick={() => {
+                  setMenuOpen(false);
+                  onEdit(project);
+                }}>
+                <MdEdit />
+                <span>Edit</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setMenuOpen(false);
+                  onDelete(project.id);
+                }}>
+                <MdDelete />
+                <span>Delete</span>
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="project-info">
-        <h3>{project.title}</h3>
+      {/* ==========================
+          PRIORITY
+      ========================== */}
 
-        <p>{project.description || 'No description available.'}</p>
+      <span className={`project-priority ${priority.toLowerCase()}`}>
+        {priority}
+      </span>
+
+      {/* ==========================
+          DESCRIPTION
+      ========================== */}
+
+      <p className="project-description">
+        {project.description || 'No description available.'}
+      </p>
+
+      {/* ==========================
+          PROGRESS
+      ========================== */}
+
+      <div className="project-progress">
+        <div className="progress-header">
+          <span>Progress</span>
+
+          <span>{project.progress ?? 0}%</span>
+        </div>
+
+        <div className="progress-bar">
+          <div
+            className="progress-fill"
+            style={{
+              width: `${project.progress ?? 0}%`,
+            }}
+          />
+        </div>
       </div>
 
-      <div className="project-meta">
-        <span
-          className={`priority-badge ${(
-            project.priority || 'medium'
-          ).toLowerCase()}`}>
-          {formatPriority(project.priority)}
-        </span>
-
-        <span
-          className={`status-badge ${(
-            project.status || 'planning'
-          ).toLowerCase()}`}>
-          <MdCircle />
-
-          {formatStatus(project.status)}
-        </span>
-      </div>
+      {/* ==========================
+          FOOTER
+      ========================== */}
 
       <div className="project-footer">
-        <div>
+        <div className="project-info">
+          <MdCheckCircle />
+
+          <span>{project.tasks ?? 0} Tasks</span>
+        </div>
+
+        <div className="project-info">
           <MdSchedule />
 
           <span>
-            Updated{' '}
-            {project.updated_at
-              ? new Date(project.updated_at).toLocaleDateString()
-              : 'Recently'}
+            {project.updated ||
+              (project.updated_at
+                ? new Date(project.updated_at).toLocaleDateString()
+                : 'Recently')}
           </span>
         </div>
-
-        {onEdit && (
-          <button
-            type="button"
-            className="project-edit-btn"
-            onClick={() => onEdit(project)}>
-            <MdEdit />
-            Edit
-          </button>
-        )}
       </div>
     </div>
   );

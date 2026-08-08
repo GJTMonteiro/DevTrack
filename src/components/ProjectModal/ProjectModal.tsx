@@ -53,27 +53,36 @@ function ProjectModal({ onClose, onCreated, project }: ProjectModalProps) {
         priority,
       };
 
-      if (project) {
-        await updateProject(String(project.id), projectData);
+      if (isEditing && project) {
+        await updateProject(Number(project.id), projectData);
       } else {
         await createProject(projectData);
       }
 
       onCreated();
+
       onClose();
     } catch (error) {
       console.error(
-        project ? 'UPDATE PROJECT ERROR:' : 'CREATE PROJECT ERROR:',
+        isEditing ? 'UPDATE PROJECT ERROR:' : 'CREATE PROJECT ERROR:',
         error,
       );
+
+      if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert(
+          isEditing ? 'Failed to update project.' : 'Failed to create project.',
+        );
+      }
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="profile-modal-overlay">
-      <div className="profile-modal">
+    <div className="project-modal-overlay">
+      <div className="project-modal">
         <h2>{isEditing ? 'Edit Project' : 'Create New Project'}</h2>
 
         <form onSubmit={handleSubmit}>
@@ -113,10 +122,10 @@ function ProjectModal({ onClose, onCreated, project }: ProjectModalProps) {
             <label>Status</label>
 
             <select value={status} onChange={(e) => setStatus(e.target.value)}>
-              <option value="Planning">Planning</option>
-              <option value="Active">Active</option>
-              <option value="Completed">Completed</option>
-              <option value="Archived">Archived</option>
+              <option>Planning</option>
+              <option>Active</option>
+              <option>Completed</option>
+              <option>Archived</option>
             </select>
           </div>
 
@@ -126,9 +135,9 @@ function ProjectModal({ onClose, onCreated, project }: ProjectModalProps) {
             <select
               value={priority}
               onChange={(e) => setPriority(e.target.value)}>
-              <option value="Low">Low</option>
-              <option value="Medium">Medium</option>
-              <option value="High">High</option>
+              <option>Low</option>
+              <option>Medium</option>
+              <option>High</option>
             </select>
           </div>
 
@@ -139,10 +148,10 @@ function ProjectModal({ onClose, onCreated, project }: ProjectModalProps) {
 
             <button type="submit" disabled={loading}>
               {loading
-                ? project
+                ? isEditing
                   ? 'Saving...'
                   : 'Creating...'
-                : project
+                : isEditing
                   ? 'Save Changes'
                   : 'Create'}
             </button>

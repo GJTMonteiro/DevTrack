@@ -4,7 +4,6 @@ import './Navbar.css';
 
 import {
   MdNotificationsNone,
-  MdPerson,
   MdSearch,
   MdDarkMode,
   MdLightMode,
@@ -36,9 +35,6 @@ function Navbar () {
                     >
                     {theme === "dark" ? <MdLightMode/> : <MdDarkMode />}
                 </button>
-                <div className="navbar-avatar">
-                    <MdPerson/>
-                </div>
             </div>
         </header>
     );
