@@ -1,7 +1,9 @@
 import './Settings.css';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+import { getProfile, type ProfileData } from '../../services/profile.service';
 
 import { useTheme } from '../../components/context/ThemeContext';
 
@@ -20,24 +22,46 @@ function Settings() {
 
   const { theme, toggleTheme } = useTheme();
 
+  const [profile, setProfile] = useState<ProfileData | null>(null);
+
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [taskNotifications, setTaskNotifications] = useState(true);
   const [weeklyReport, setWeeklyReport] = useState(false);
+
+  useEffect(() => {
+    async function loadProfile() {
+      try {
+        const data = await getProfile();
+
+        setProfile(data);
+      } catch (error) {
+        console.error('Error loading profile:', error);
+      }
+    }
+
+    loadProfile();
+  }, []);
 
   function handleLogout() {
     localStorage.removeItem('token');
     localStorage.removeItem('userName');
     localStorage.removeItem('username');
+    localStorage.removeItem('user');
+
+    sessionStorage.removeItem('token');
 
     navigate('/login');
   }
 
-  const fullName = localStorage.getItem('userName') || 'Developer';
-  const username = localStorage.getItem('username') || 'developer';
+  const fullName = profile?.name || 'Developer';
+  const username = profile?.username || 'developer';
+  const email = profile?.email || '';
+  const role = profile?.role || 'Developer';
 
   return (
     <main className="settings-content">
       {/* HEADER */}
+
       <section className="settings-header">
         <div>
           <h1>Settings</h1>
@@ -47,6 +71,7 @@ function Settings() {
       </section>
 
       {/* PROFILE */}
+
       <section className="settings-card">
         <div className="settings-card-title">
           <MdPerson />
@@ -70,18 +95,19 @@ function Settings() {
           <div className="settings-group">
             <label>Email</label>
 
-            <input type="email" value="user@email.com" readOnly />
+            <input type="email" value={email} readOnly />
           </div>
 
           <div className="settings-group">
             <label>Role</label>
 
-            <input type="text" value="Front-End Developer" readOnly />
+            <input type="text" value={role} readOnly />
           </div>
         </div>
       </section>
 
       {/* APPEARANCE */}
+
       <section className="settings-card">
         <div className="settings-card-title">
           <MdDarkMode />
@@ -128,6 +154,7 @@ function Settings() {
       </section>
 
       {/* NOTIFICATIONS */}
+
       <section className="settings-card">
         <div className="settings-card-title">
           <MdNotifications />
@@ -191,6 +218,7 @@ function Settings() {
       </section>
 
       {/* SECURITY */}
+
       <section className="settings-card">
         <div className="settings-card-title">
           <MdSecurity />
@@ -220,6 +248,7 @@ function Settings() {
       </section>
 
       {/* WORKSPACE */}
+
       <section className="settings-card">
         <div className="settings-card-title">
           <MdStorage />
@@ -249,6 +278,7 @@ function Settings() {
       </section>
 
       {/* ACCOUNT */}
+
       <section className="settings-card danger-zone">
         <div className="settings-card-title">
           <MdLogout />

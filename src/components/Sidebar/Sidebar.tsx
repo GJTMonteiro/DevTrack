@@ -1,6 +1,6 @@
 import './Sidebar.css';
 
-import logo from '../../assets/stussy-night.jpeg';
+import { useEffect, useState } from 'react';
 
 import { NavLink, useNavigate } from 'react-router-dom';
 
@@ -13,12 +13,35 @@ import {
   MdLogout,
 } from 'react-icons/md';
 
+import { getProfile, type ProfileData } from '../../services/profile.service';
+
+import { getAvatar } from '../../utils/avatars';
+
 function Sidebar() {
   const navigate = useNavigate();
+
+  const [profile, setProfile] = useState<ProfileData | null>(null);
+
+  useEffect(() => {
+    async function loadProfile() {
+      try {
+        const data = await getProfile();
+
+        setProfile(data);
+      } catch (error) {
+        console.error('Error loading profile:', error);
+      }
+    }
+
+    loadProfile();
+  }, []);
 
   function handleLogout() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('userName');
+
+    sessionStorage.removeItem('token');
 
     navigate('/login', {
       replace: true,
@@ -28,8 +51,8 @@ function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
-        <NavLink className="sidebar-logo-link" to="/dashboard">
-          <img src={logo} alt="DevTrack Logo" />
+        <NavLink to="/dashboard" className="sidebar-logo-link">
+          <img src={getAvatar(profile?.avatar)} alt="DevTrack avatar" />
 
           <span>DevTrack</span>
         </NavLink>
@@ -80,7 +103,7 @@ function Sidebar() {
       </nav>
 
       <div className="sidebar-footer">
-        <button className="sidebar-logout" onClick={handleLogout}>
+        <button type="button" className="sidebar-logout" onClick={handleLogout}>
           <MdLogout />
 
           <span>Logout</span>

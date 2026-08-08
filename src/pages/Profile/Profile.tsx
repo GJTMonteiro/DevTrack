@@ -5,7 +5,7 @@ import './Profile.css';
 
 import ProfileModal from '../../components/ProfileModal/ProfileModal';
 
-import Avatar from '../../assets/stussy-night.jpeg';
+import { getAvatar } from '../../utils/avatars';
 
 import ReactCountryFlag from 'react-country-flag';
 
@@ -19,6 +19,7 @@ import {
 import StatCard from '../Dashboard/StatCard';
 
 import { getProjects } from '../../services/project.service';
+
 import { getProfile, type ProfileData } from '../../services/profile.service';
 
 import type { Project } from '../../types/project';
@@ -62,6 +63,7 @@ function Profile() {
 
   function handleEditProfile() {
     console.log('EDIT CLICK');
+
     setShowProfileModal(true);
   }
 
@@ -72,11 +74,13 @@ function Profile() {
 
     sessionStorage.removeItem('token');
 
-    navigate('/login');
+    navigate('/login', {
+      replace: true,
+    });
   }
 
   if (!profile) {
-    return <p>Loading profile...</p>;
+    return <div>Loading profile...</div>;
   }
 
   const details = [
@@ -99,7 +103,13 @@ function Profile() {
   return (
     <section className="profile-content">
       <div className="profile-header">
-        <img src={Avatar} alt="Profile avatar" className="profile-avatar" />
+        <div className="profile-avatar-wrapper">
+          <img
+            src={getAvatar(profile.avatar)}
+            alt={`${profile.name}'s avatar`}
+            className="profile-avatar"
+          />
+        </div>
 
         <div className="profile-info">
           <h1 className="profile-name">
@@ -199,19 +209,21 @@ function Profile() {
           </li>
 
           <li>
-            <button>Change Password</button>
+            <button type="button">Change Password</button>
           </li>
 
           <li>
-            <button>Security</button>
+            <button type="button">Security</button>
           </li>
 
           <li>
-            <button>Notifications</button>
+            <button type="button">Notifications</button>
           </li>
 
           <li>
-            <button onClick={handleLogout}>Logout</button>
+            <button type="button" onClick={handleLogout}>
+              Logout
+            </button>
           </li>
         </ul>
       </div>

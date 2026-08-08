@@ -1,5 +1,14 @@
 import apiFetch from './api';
 
+export const AVATARS = [
+  'avatar-1',
+  'avatar-2',
+  'avatar-3',
+  'avatar-4',
+] as const;
+
+export type Avatar = (typeof AVATARS)[number];
+
 export interface ProfileData {
   name: string;
   username: string;
@@ -8,6 +17,7 @@ export interface ProfileData {
   bio?: string;
   country: string;
   country_code: string;
+  avatar: Avatar | null;
 }
 
 export async function getProfile(): Promise<ProfileData> {
@@ -16,9 +26,13 @@ export async function getProfile(): Promise<ProfileData> {
   return data.profile;
 }
 
-export async function updateProfile(profile: ProfileData) {
-  return await apiFetch('/profile', {
+export async function updateProfile(
+  profile: ProfileData,
+): Promise<ProfileData> {
+  const data = await apiFetch('/profile', {
     method: 'PUT',
     body: JSON.stringify(profile),
   });
+
+  return data.profile ?? data;
 }

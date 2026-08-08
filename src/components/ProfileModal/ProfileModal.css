@@ -294,8 +294,6 @@
   padding: 6px;
 }
 
-/* Scrollbar */
-
 .country-list::-webkit-scrollbar {
   width: 7px;
 }
@@ -378,6 +376,104 @@
   text-align: center;
 
   font-size: 0.9rem;
+}
+
+.avatar-form-group {
+  gap: 12px;
+}
+
+.avatar-form-group label {
+  color: var(--color-text-secondary);
+
+  font-size: 0.9rem;
+
+  font-weight: 500;
+}
+
+.avatar-grid {
+  display: grid;
+
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+
+  gap: 12px;
+
+  width: 100%;
+}
+
+.avatar-option {
+  position: relative;
+
+  width: 100%;
+
+  aspect-ratio: 1;
+
+  padding: 4px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border: 2px solid var(--color-border);
+
+  border-radius: 14px;
+
+  background: var(--color-background);
+
+  cursor: pointer;
+
+  overflow: hidden;
+
+  transition:
+    transform var(--transition-fast),
+    border-color var(--transition-fast),
+    background var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.avatar-option:hover {
+  transform: translateY(-2px);
+
+  border-color: var(--color-primary);
+
+  background: var(--color-hover);
+}
+
+.avatar-option img {
+  width: 100%;
+
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+
+  border-radius: 10px;
+}
+
+.avatar-option.selected {
+  border-color: var(--color-primary);
+
+  background: var(--color-primary);
+
+  box-shadow:
+    0 0 0 2px var(--color-surface),
+    0 0 0 4px var(--color-primary);
+
+  transform: translateY(-2px);
+}
+
+.avatar-option.selected:hover {
+  transform: translateY(-2px);
+}
+
+.avatar-option:disabled {
+  opacity: 0.6;
+
+  cursor: not-allowed;
+
+  transform: none;
 }
 
 .profile-modal-actions {
@@ -496,6 +592,36 @@
 
   .country-list {
     max-height: 220px;
+  }
+
+  .avatar-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+
+    gap: 8px;
+  }
+
+  .avatar-option {
+    padding: 3px;
+
+    border-radius: 11px;
+  }
+
+  .avatar-option img {
+    border-radius: 8px;
+  }
+}
+
+@media (max-width: 400px) {
+  .avatar-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+
+    gap: 6px;
+  }
+
+  .avatar-option {
+    border-width: 1px;
+
+    padding: 2px;
   }
 }
 

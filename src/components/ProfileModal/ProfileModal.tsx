@@ -2,11 +2,22 @@ import './ProfileModal.css';
 
 import { useEffect, useState } from 'react';
 
-import { getProfile, updateProfile } from '../../services/profile.service';
+import {
+  getProfile,
+  updateProfile,
+  AVATARS,
+  type Avatar,
+} from '../../services/profile.service';
 
 import { getCountryCode, countries } from '../../utils/countries';
 
 import { availableRoles } from '../../utils/roles';
+
+import Avatar1 from '../../assets/avatars/avatar-1.jpg';
+import Avatar2 from '../../assets/avatars/avatar-2.jpg';
+import Avatar3 from '../../assets/avatars/avatar-3.jpeg';
+import Avatar4 from '../../assets/avatars/avatar-4.jpeg';
+import DefaultAvatar from '../../assets/avatars/default-avatar.svg';
 
 interface ProfileModalProps {
   onClose: () => void;
@@ -20,9 +31,17 @@ function ProfileModal({ onClose }: ProfileModalProps) {
   const [email, setEmail] = useState(user.email || '');
   const [role, setRole] = useState('');
   const [country, setCountry] = useState('');
+  const [avatar, setAvatar] = useState<Avatar | null>(null);
   const [loading, setLoading] = useState(false);
 
   const country_code = getCountryCode(country);
+
+  const avatarImages: Record<Avatar, string> = {
+    'avatar-1': Avatar1,
+    'avatar-2': Avatar2,
+    'avatar-3': Avatar3,
+    'avatar-4': Avatar4,
+  };
 
   useEffect(() => {
     async function loadProfile() {
@@ -34,8 +53,10 @@ function ProfileModal({ onClose }: ProfileModalProps) {
         setEmail(profile.email ?? '');
         setRole(profile.role ?? '');
         setCountry(profile.country ?? '');
+
+        setAvatar(profile.avatar);
       } catch (error) {
-        console.error(error);
+        console.error('Error loading profile:', error);
       }
     }
 
@@ -56,13 +77,14 @@ function ProfileModal({ onClose }: ProfileModalProps) {
         country,
         country_code,
         bio: '',
+        avatar,
       });
 
       console.log('Resposta da API:', response);
 
-      localStorage.setItem('user', JSON.stringify(response.profile));
+      localStorage.setItem('user', JSON.stringify(response));
 
-      localStorage.setItem('userName', response.profile.name);
+      localStorage.setItem('userName', response.name);
 
       onClose();
 
@@ -83,13 +105,28 @@ function ProfileModal({ onClose }: ProfileModalProps) {
   return (
     <div className="profile-modal-overlay">
       <div className="profile-modal">
-        <h2>Edit Profile</h2>
+        <div className="profile-modal-header">
+          <h2>Edit Profile</h2>
+
+          <button
+            type="button"
+            className="profile-modal-close"
+            onClick={onClose}
+            disabled={loading}
+            aria-label="Close modal">
+            ×
+          </button>
+        </div>
 
         <form onSubmit={handleSave}>
           <div className="form-group">
             <label>Name</label>
 
-            <input value={name} onChange={(e) => setName(e.target.value)} />
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              disabled={loading}
+            />
           </div>
 
           <div className="form-group">
@@ -98,8 +135,10 @@ function ProfileModal({ onClose }: ProfileModalProps) {
             <input
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              disabled={loading}
             />
           </div>
+
           <div className="form-group">
             <label>Email</label>
 
@@ -107,6 +146,7 @@ function ProfileModal({ onClose }: ProfileModalProps) {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled={loading}
             />
           </div>
 
@@ -153,8 +193,41 @@ function ProfileModal({ onClose }: ProfileModalProps) {
             )}
           </div>
 
+          <div className="form-group avatar-form-group">
+            <label>Choose Avatar</label>
+
+            <div className="avatar-grid">
+              {/* DEFAULT AVATAR */}
+              <button
+                type="button"
+                className={`avatar-option ${avatar === null ? 'selected' : ''}`}
+                onClick={() => setAvatar(null)}
+                disabled={loading}
+                aria-label="Use default avatar"
+                aria-pressed={avatar === null}>
+                <img src={DefaultAvatar} alt="Default avatar" />
+              </button>
+
+              {/* AVATARS */}
+              {AVATARS.map((avatarOption) => (
+                <button
+                  key={avatarOption}
+                  type="button"
+                  className={`avatar-option ${
+                    avatar === avatarOption ? 'selected' : ''
+                  }`}
+                  onClick={() => setAvatar(avatarOption)}
+                  disabled={loading}
+                  aria-label={`Select ${avatarOption}`}
+                  aria-pressed={avatar === avatarOption}>
+                  <img src={avatarImages[avatarOption]} alt={avatarOption} />
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div className="profile-modal-actions">
-            <button type="button" onClick={onClose}>
+            <button type="button" onClick={onClose} disabled={loading}>
               Cancel
             </button>
 
