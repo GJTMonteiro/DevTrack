@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom';
+
 import ProjectCard from '../Project/ProjectCard';
 
 import './RecentProjects.css';
@@ -10,27 +12,49 @@ interface RecentProjectsProps {
 }
 
 function RecentProjects({ projects, loading }: RecentProjectsProps) {
-  if (loading) {
-    return <p className="projects-message">Loading projects...</p>;
-  }
+  const navigate = useNavigate();
 
-  if (!projects.length) {
-    return <p className="projects-message">No projects yet.</p>;
+  if (loading) {
+    return (
+      <section className="recent-projects-card">
+        <div className="recent-projects-header">
+          <h2>Recent Projects</h2>
+
+          <button
+            type="button"
+            className="project-viewall-btn"
+            onClick={() => navigate('/projects')}>
+            View All
+          </button>
+        </div>
+
+        <p className="recent-projects-message">Loading projects...</p>
+      </section>
+    );
   }
 
   return (
-    <section className="recent-projects">
+    <section className="recent-projects-card">
       <div className="recent-projects-header">
         <h2>Recent Projects</h2>
 
-        <button className="project-viewall-btn">View All</button>
+        <button
+          type="button"
+          className="project-viewall-btn"
+          onClick={() => navigate('/projects')}>
+          View All
+        </button>
       </div>
 
-      <div className="recent-projects-grid">
-        {projects.slice(0, 3).map((project) => (
-          <ProjectCard key={project.id} project={project} />
-        ))}
-      </div>
+      {!projects.length ? (
+        <p className="recent-projects-message">No projects yet.</p>
+      ) : (
+        <div className="recent-projects-grid">
+          {projects.slice(0, 3).map((project) => (
+            <ProjectCard key={project.id} project={project} />
+          ))}
+        </div>
+      )}
     </section>
   );
 }

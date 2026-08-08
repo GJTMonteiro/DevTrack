@@ -2,6 +2,8 @@ import './RecentTasks.css';
 
 import { useEffect, useState } from 'react';
 
+import { useNavigate } from 'react-router-dom';
+
 import { MdCheckCircle, MdAccessTime, MdPriorityHigh } from 'react-icons/md';
 
 import { getTasks } from '../../services/task.service';
@@ -9,6 +11,8 @@ import { getTasks } from '../../services/task.service';
 import type { Task } from '../../types/task';
 
 function RecentTasks() {
+  const navigate = useNavigate();
+
   const [tasks, setTasks] = useState<Task[]>([]);
 
   useEffect(() => {
@@ -16,7 +20,6 @@ function RecentTasks() {
       try {
         const data = await getTasks();
 
-        // Apenas as 5 tarefas mais recentes
         setTasks(data.tasks.slice(0, 5));
       } catch (error) {
         console.error(error);
@@ -31,7 +34,9 @@ function RecentTasks() {
       <div className="recent-tasks-header">
         <h2>Recent Tasks</h2>
 
-        <button>View All</button>
+        <button type="button" onClick={() => navigate('/tasks')}>
+          View All
+        </button>
       </div>
 
       <div className="recent-tasks-list">

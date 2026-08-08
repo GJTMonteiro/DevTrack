@@ -33,9 +33,6 @@ function Projects() {
     loadProjects();
   }, []);
 
-  // ==========================
-  // CREATE
-  // ==========================
 
   function handleCreateProject() {
     setSelectedProject(null);
@@ -43,19 +40,11 @@ function Projects() {
     setShowModal(true);
   }
 
-  // ==========================
-  // EDIT
-  // ==========================
-
   function handleEditProject(project: Project) {
     setSelectedProject(project);
 
     setShowModal(true);
   }
-
-  // ==========================
-  // DELETE
-  // ==========================
 
   async function handleDeleteProject(projectId: number) {
     try {
@@ -72,10 +61,6 @@ function Projects() {
       }
     }
   }
-
-  // ==========================
-  // CLOSE MODAL
-  // ==========================
 
   function handleCloseModal() {
     setShowModal(false);

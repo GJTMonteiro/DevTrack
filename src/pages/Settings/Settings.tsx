@@ -3,6 +3,8 @@ import './Settings.css';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { useTheme } from '../../components/context/ThemeContext';
+
 import {
   MdPerson,
   MdDarkMode,
@@ -16,18 +18,11 @@ import {
 function Settings() {
   const navigate = useNavigate();
 
-  const [darkMode, setDarkMode] = useState(true);
+  const { theme, toggleTheme } = useTheme();
 
   const [emailNotifications, setEmailNotifications] = useState(true);
-
   const [taskNotifications, setTaskNotifications] = useState(true);
-
   const [weeklyReport, setWeeklyReport] = useState(false);
-
-  function handleThemeToggle() {
-    document.body.classList.toggle('light-mode');
-    setDarkMode(!darkMode);
-  }
 
   function handleLogout() {
     localStorage.removeItem('token');
@@ -38,11 +33,11 @@ function Settings() {
   }
 
   const fullName = localStorage.getItem('userName') || 'Developer';
-
   const username = localStorage.getItem('username') || 'developer';
 
   return (
-    <main className="settings-page">
+    <main className="settings-content">
+      {/* HEADER */}
       <section className="settings-header">
         <div>
           <h1>Settings</h1>
@@ -51,6 +46,7 @@ function Settings() {
         </div>
       </section>
 
+      {/* PROFILE */}
       <section className="settings-card">
         <div className="settings-card-title">
           <MdPerson />
@@ -85,6 +81,7 @@ function Settings() {
         </div>
       </section>
 
+      {/* APPEARANCE */}
       <section className="settings-card">
         <div className="settings-card-title">
           <MdDarkMode />
@@ -95,16 +92,20 @@ function Settings() {
         <div className="settings-option">
           <div className="settings-option-info">
             <div>
-              <strong>Dark Mode</strong>
+              <strong>{theme === 'dark' ? 'Dark Mode' : 'Light Mode'}</strong>
 
-              <p>Switch between dark and light theme.</p>
+              <p>
+                {theme === 'dark'
+                  ? 'Dark theme is currently active.'
+                  : 'Light theme is currently active.'}
+              </p>
             </div>
 
             <label className="switch">
               <input
                 type="checkbox"
-                checked={darkMode}
-                onChange={handleThemeToggle}
+                checked={theme === 'dark'}
+                onChange={toggleTheme}
               />
 
               <span className="slider"></span>
@@ -126,6 +127,7 @@ function Settings() {
         </div>
       </section>
 
+      {/* NOTIFICATIONS */}
       <section className="settings-card">
         <div className="settings-card-title">
           <MdNotifications />
@@ -188,6 +190,7 @@ function Settings() {
         </div>
       </section>
 
+      {/* SECURITY */}
       <section className="settings-card">
         <div className="settings-card-title">
           <MdSecurity />
@@ -216,6 +219,7 @@ function Settings() {
         </div>
       </section>
 
+      {/* WORKSPACE */}
       <section className="settings-card">
         <div className="settings-card-title">
           <MdStorage />
@@ -244,6 +248,7 @@ function Settings() {
         </div>
       </section>
 
+      {/* ACCOUNT */}
       <section className="settings-card danger-zone">
         <div className="settings-card-title">
           <MdLogout />

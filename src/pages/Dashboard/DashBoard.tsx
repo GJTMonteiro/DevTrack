@@ -57,7 +57,6 @@ function Dashboard() {
         ]);
 
         setRecentProjects(projectsData.projects);
-
         setTasks(tasksData.tasks);
       } catch (error) {
         console.error('Error loading dashboard:', error);
@@ -91,10 +90,6 @@ function Dashboard() {
           <p>Overview of your work</p>
 
           <span>{formattedDate}</span>
-        </div>
-
-        <div className="welcome-actions">
-          <button className="new-project-btn">+ New Project</button>
         </div>
       </section>
 

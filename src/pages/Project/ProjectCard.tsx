@@ -16,9 +16,9 @@ import type { Project } from '../../types/project';
 interface ProjectCardProps {
   project: Project;
 
-  onEdit: (project: Project) => void;
+  onEdit?: (project: Project) => void;
 
-  onDelete: (projectId: number) => void;
+  onDelete?: (projectId: number) => void;
 }
 
 function ProjectCard({ project, onEdit, onDelete }: ProjectCardProps) {
@@ -26,14 +26,12 @@ function ProjectCard({ project, onEdit, onDelete }: ProjectCardProps) {
 
   const priority = project.priority ?? 'Medium';
 
+  const hasActions = onEdit || onDelete;
+
   return (
     <div className="project-card">
-      {/* ==========================
-          HEADER
-      ========================== */}
-
-      <div className="project-top">
-        <div className="project-title">
+      <div className="project-card-header">
+        <div className="project-card-title">
           <div
             className="project-icon"
             style={{
@@ -45,64 +43,54 @@ function ProjectCard({ project, onEdit, onDelete }: ProjectCardProps) {
           <h3>{project.title}</h3>
         </div>
 
-        {/* ==========================
-            PROJECT MENU
-        ========================== */}
+        {hasActions && (
+          <div className="project-menu-wrapper">
+            <button
+              type="button"
+              className="project-menu"
+              aria-label="Project options"
+              onClick={() => setMenuOpen((previous) => !previous)}>
+              <MdMoreVert />
+            </button>
 
-        <div className="project-menu-wrapper">
-          <button
-            type="button"
-            className="project-menu"
-            aria-label="Project options"
-            onClick={() => setMenuOpen((previous) => !previous)}>
-            <MdMoreVert />
-          </button>
+            {menuOpen && (
+              <div className="project-menu-dropdown">
+                {onEdit && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      onEdit(project);
+                    }}>
+                    <MdEdit />
+                    <span>Edit</span>
+                  </button>
+                )}
 
-          {menuOpen && (
-            <div className="project-menu-dropdown">
-              <button
-                type="button"
-                onClick={() => {
-                  setMenuOpen(false);
-                  onEdit(project);
-                }}>
-                <MdEdit />
-                <span>Edit</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setMenuOpen(false);
-                  onDelete(project.id);
-                }}>
-                <MdDelete />
-                <span>Delete</span>
-              </button>
-            </div>
-          )}
-        </div>
+                {onDelete && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      onDelete(project.id);
+                    }}>
+                    <MdDelete />
+                    <span>Delete</span>
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        )}
       </div>
-
-      {/* ==========================
-          PRIORITY
-      ========================== */}
 
       <span className={`project-priority ${priority.toLowerCase()}`}>
         {priority}
       </span>
 
-      {/* ==========================
-          DESCRIPTION
-      ========================== */}
-
       <p className="project-description">
         {project.description || 'No description available.'}
       </p>
-
-      {/* ==========================
-          PROGRESS
-      ========================== */}
 
       <div className="project-progress">
         <div className="progress-header">
@@ -120,10 +108,6 @@ function ProjectCard({ project, onEdit, onDelete }: ProjectCardProps) {
           />
         </div>
       </div>
-
-      {/* ==========================
-          FOOTER
-      ========================== */}
 
       <div className="project-footer">
         <div className="project-info">
