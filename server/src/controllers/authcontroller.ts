@@ -4,11 +4,12 @@ import jwt from 'jsonwebtoken';
 
 import pool from '../config/database.js';
 
+import { AuthRequest } from '../middleware/auth.middleware.js';
+
 export async function register(req: Request, res: Response) {
   try {
     const { name, username, email, password } = req.body;
 
-    // Verificar se já existe email ou username
     const existingUser = await pool.query(
       `
       SELECT id
@@ -24,11 +25,8 @@ export async function register(req: Request, res: Response) {
       });
     }
 
-    // Criar hash da password
     const passwordHash = await bcrypt.hash(password, 10);
 
-    // Criar utilizador
-    // O avatar começa como NULL.
     const result = await pool.query(
       `
       INSERT INTO users
@@ -52,14 +50,14 @@ export async function register(req: Request, res: Response) {
       [name, username, email, passwordHash],
     );
 
-    res.status(201).json({
+    return res.status(201).json({
       message: 'User created successfully',
       user: result.rows[0],
     });
   } catch (error) {
     console.error('REGISTER ERROR:', error);
 
-    res.status(500).json({
+    return res.status(500).json({
       message: 'Internal server error',
     });
   }
@@ -69,7 +67,6 @@ export async function login(req: Request, res: Response) {
   try {
     const { email, password } = req.body;
 
-    // Procurar utilizador pelo email
     const result = await pool.query(
       `
       SELECT *
@@ -87,7 +84,6 @@ export async function login(req: Request, res: Response) {
 
     const user = result.rows[0];
 
-    // Comparar password
     const passwordMatch = await bcrypt.compare(password, user.password_hash);
 
     if (!passwordMatch) {
@@ -95,8 +91,6 @@ export async function login(req: Request, res: Response) {
         message: 'Invalid email or password',
       });
     }
-
-    // Criar JWT
     const token = jwt.sign(
       {
         id: user.id,
@@ -108,7 +102,7 @@ export async function login(req: Request, res: Response) {
       },
     );
 
-    res.status(200).json({
+    return res.status(200).json({
       message: 'Login successful',
       token,
       user: {
@@ -122,16 +116,14 @@ export async function login(req: Request, res: Response) {
   } catch (error) {
     console.error('LOGIN ERROR:', error);
 
-    res.status(500).json({
+    return res.status(500).json({
       message: 'Internal server error',
     });
   }
 }
 
-import { AuthRequest } from '../middleware/auth.middleware.js';
-
 export async function me(req: AuthRequest, res: Response) {
-  res.status(200).json({
+  return res.status(200).json({
     message: 'Authenticated',
     user: req.user,
   });
