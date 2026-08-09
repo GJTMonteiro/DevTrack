@@ -55,6 +55,11 @@ function ProjectModal({ onClose, onCreated, project }: ProjectModalProps) {
     }
 
     const trimmedTitle = title.trim();
+    const trimmedDescription = description.trim();
+
+    // =========================
+    // VALIDATION
+    // =========================
 
     if (!trimmedTitle) {
       alert('Project title is required.');
@@ -66,7 +71,7 @@ function ProjectModal({ onClose, onCreated, project }: ProjectModalProps) {
 
       const projectData = {
         title: trimmedTitle,
-        description: description.trim(),
+        description: trimmedDescription,
         color,
         status,
         priority,
@@ -81,7 +86,7 @@ function ProjectModal({ onClose, onCreated, project }: ProjectModalProps) {
 
         console.log('PROJECT UPDATED SUCCESSFULLY');
 
-        // Atualizar lista de projetos
+        // Atualiza a lista de projetos
         await onCreated();
       }
 
@@ -93,7 +98,7 @@ function ProjectModal({ onClose, onCreated, project }: ProjectModalProps) {
 
         console.log('PROJECT CREATED SUCCESSFULLY:', response);
 
-        // Atualizar lista de projetos
+        // Atualiza a lista de projetos
         await onCreated();
       }
 
@@ -121,7 +126,13 @@ function ProjectModal({ onClose, onCreated, project }: ProjectModalProps) {
   }
 
   return (
-    <div className="project-modal-overlay">
+    <div
+      className="project-modal-overlay"
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget && !loading) {
+          onClose();
+        }
+      }}>
       <div className="project-modal">
         {/* =========================
             HEADER
@@ -135,7 +146,7 @@ function ProjectModal({ onClose, onCreated, project }: ProjectModalProps) {
             className="project-modal-close"
             onClick={onClose}
             disabled={loading}
-            aria-label="Close">
+            aria-label="Close modal">
             ×
           </button>
         </div>
@@ -227,7 +238,9 @@ function ProjectModal({ onClose, onCreated, project }: ProjectModalProps) {
             </select>
           </div>
 
-          {/* ACTIONS */}
+          {/* =========================
+              ACTIONS
+          ========================= */}
 
           <div className="project-modal-actions">
             <button type="button" onClick={onClose} disabled={loading}>

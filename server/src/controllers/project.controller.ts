@@ -3,6 +3,7 @@ import { Response } from 'express';
 import pool from '../config/database.js';
 import { AuthRequest } from '../middleware/auth.middleware.js';
 import { createNotification } from '../utils/notification.js';
+import { createActivity } from '../utils/activity.js';
 
 // ============================================================
 // CREATE PROJECT
@@ -65,6 +66,17 @@ export async function createProject(req: AuthRequest, res: Response) {
     const project = result.rows[0];
 
     console.log('PROJECT CREATED:', project);
+
+    // =========================
+    // CREATE ACTIVITY
+    // =========================
+
+    await createActivity(
+      userId,
+      'project_created',
+      'Project Created',
+      `Project "${project.title}" was created successfully.`,
+    );
 
     // =========================
     // CHECK CREATE NOTIFICATIONS
@@ -311,6 +323,17 @@ export async function updateProject(req: AuthRequest, res: Response) {
     console.log('PROJECT UPDATED:', project);
 
     // =========================
+    // CREATE ACTIVITY
+    // =========================
+
+    await createActivity(
+      userId,
+      'project_updated',
+      'Project Updated',
+      `Project "${project.title}" was updated successfully.`,
+    );
+
+    // =========================
     // CHECK UPDATE NOTIFICATIONS
     // =========================
 
@@ -408,6 +431,17 @@ export async function deleteProject(req: AuthRequest, res: Response) {
     const project = projectResult.rows[0];
 
     console.log('PROJECT TO DELETE:', project);
+
+    // =========================
+    // CREATE ACTIVITY
+    // =========================
+
+    await createActivity(
+      userId,
+      'project_deleted',
+      'Project Deleted',
+      `Project "${project.title}" was deleted successfully.`,
+    );
 
     // =========================
     // DELETE PROJECT

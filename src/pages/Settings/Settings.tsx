@@ -30,16 +30,28 @@ function Settings() {
 
   const [profile, setProfile] = useState<ProfileData | null>(null);
 
+  // ============================================================
   // NOTIFICATIONS
+  // ============================================================
+
   const [settings, setSettings] = useState<SettingsData>({
+    // PROJECTS
     project_created_notifications: true,
     project_updated_notifications: true,
     project_deleted_notifications: true,
+
+    // TASKS
+    task_created_notifications: true,
+    task_updated_notifications: true,
+    task_deleted_notifications: true,
   });
 
   const [settingsLoading, setSettingsLoading] = useState(false);
 
+  // ============================================================
   // CHANGE PASSWORD
+  // ============================================================
+
   const [showPasswordModal, setShowPasswordModal] = useState(false);
 
   const [currentPassword, setCurrentPassword] = useState('');
@@ -50,7 +62,10 @@ function Settings() {
   const [passwordError, setPasswordError] = useState('');
   const [passwordSuccess, setPasswordSuccess] = useState('');
 
+  // ============================================================
   // LOAD PROFILE + SETTINGS
+  // ============================================================
+
   useEffect(() => {
     async function loadProfile() {
       try {
@@ -76,7 +91,10 @@ function Settings() {
     loadSettings();
   }, []);
 
+  // ============================================================
   // LOGOUT
+  // ============================================================
+
   function handleLogout() {
     localStorage.removeItem('token');
     localStorage.removeItem('userName');
@@ -90,7 +108,10 @@ function Settings() {
     });
   }
 
+  // ============================================================
   // OPEN PASSWORD MODAL
+  // ============================================================
+
   function handleOpenPasswordModal() {
     setCurrentPassword('');
     setNewPassword('');
@@ -102,7 +123,10 @@ function Settings() {
     setShowPasswordModal(true);
   }
 
+  // ============================================================
   // CLOSE PASSWORD MODAL
+  // ============================================================
+
   function handleClosePasswordModal() {
     if (passwordLoading) {
       return;
@@ -118,12 +142,19 @@ function Settings() {
     setPasswordSuccess('');
   }
 
+  // ============================================================
   // CHANGE PASSWORD
+  // ============================================================
+
   async function handleChangePassword(event: React.FormEvent) {
     event.preventDefault();
 
     setPasswordError('');
     setPasswordSuccess('');
+
+    // =========================
+    // VALIDATION
+    // =========================
 
     if (!currentPassword || !newPassword || !confirmPassword) {
       setPasswordError('Please fill in all fields.');
@@ -146,6 +177,10 @@ function Settings() {
       );
       return;
     }
+
+    // =========================
+    // REQUEST
+    // =========================
 
     try {
       setPasswordLoading(true);
@@ -201,7 +236,10 @@ function Settings() {
     }
   }
 
+  // ============================================================
   // UPDATE NOTIFICATION SETTING
+  // ============================================================
+
   async function handleNotificationChange(setting: keyof SettingsData) {
     const previousSettings = settings;
 
@@ -210,8 +248,15 @@ function Settings() {
       [setting]: !settings[setting],
     };
 
-    // Atualização imediata no UI
+    // =========================
+    // UPDATE UI IMMEDIATELY
+    // =========================
+
     setSettings(updatedSettings);
+
+    // =========================
+    // UPDATE DATABASE
+    // =========================
 
     try {
       setSettingsLoading(true);
@@ -222,7 +267,10 @@ function Settings() {
     } catch (error) {
       console.error('UPDATE SETTINGS ERROR:', error);
 
-      // Reverter se a API falhar
+      // =========================
+      // ROLLBACK
+      // =========================
+
       setSettings(previousSettings);
 
       if (error instanceof Error) {
@@ -235,14 +283,24 @@ function Settings() {
     }
   }
 
+  // ============================================================
+  // PROFILE DATA
+  // ============================================================
+
   const fullName = profile?.name || 'Developer';
   const username = profile?.username || 'developer';
   const email = profile?.email || '';
   const role = profile?.role || 'Developer';
 
+  // ============================================================
+  // RENDER
+  // ============================================================
+
   return (
     <main className="settings-content">
-      {/* HEADER */}
+      {/* ========================================================
+          HEADER
+      ======================================================== */}
 
       <section className="settings-header">
         <div>
@@ -252,7 +310,9 @@ function Settings() {
         </div>
       </section>
 
-      {/* PROFILE */}
+      {/* ========================================================
+          PROFILE
+      ======================================================== */}
 
       <section className="settings-card">
         <div className="settings-card-title">
@@ -288,7 +348,9 @@ function Settings() {
         </div>
       </section>
 
-      {/* APPEARANCE */}
+      {/* ========================================================
+          APPEARANCE
+      ======================================================== */}
 
       <section className="settings-card">
         <div className="settings-card-title">
@@ -322,7 +384,9 @@ function Settings() {
         </div>
       </section>
 
-      {/* NOTIFICATIONS */}
+      {/* ========================================================
+          NOTIFICATIONS
+      ======================================================== */}
 
       <section className="settings-card">
         <div className="settings-card-title">
@@ -331,7 +395,9 @@ function Settings() {
           <h2>Notifications</h2>
         </div>
 
-        {/* PROJECT CREATED */}
+        {/* ======================================================
+            PROJECT CREATED
+        ====================================================== */}
 
         <div className="settings-option">
           <div>
@@ -354,7 +420,9 @@ function Settings() {
           </label>
         </div>
 
-        {/* PROJECT UPDATED */}
+        {/* ======================================================
+            PROJECT UPDATED
+        ====================================================== */}
 
         <div className="settings-option">
           <div>
@@ -377,7 +445,9 @@ function Settings() {
           </label>
         </div>
 
-        {/* PROJECT DELETED */}
+        {/* ======================================================
+            PROJECT DELETED
+        ====================================================== */}
 
         <div className="settings-option">
           <div>
@@ -399,9 +469,86 @@ function Settings() {
             <span className="slider"></span>
           </label>
         </div>
+
+        {/* ======================================================
+            TASK CREATED
+        ====================================================== */}
+
+        <div className="settings-option">
+          <div>
+            <strong>Task Created</strong>
+
+            <p>Notify me when a new task is created.</p>
+          </div>
+
+          <label className="switch">
+            <input
+              type="checkbox"
+              checked={settings.task_created_notifications}
+              onChange={() =>
+                handleNotificationChange('task_created_notifications')
+              }
+              disabled={settingsLoading}
+            />
+
+            <span className="slider"></span>
+          </label>
+        </div>
+
+        {/* ======================================================
+            TASK UPDATED
+        ====================================================== */}
+
+        <div className="settings-option">
+          <div>
+            <strong>Task Updated</strong>
+
+            <p>Notify me when a task is updated.</p>
+          </div>
+
+          <label className="switch">
+            <input
+              type="checkbox"
+              checked={settings.task_updated_notifications}
+              onChange={() =>
+                handleNotificationChange('task_updated_notifications')
+              }
+              disabled={settingsLoading}
+            />
+
+            <span className="slider"></span>
+          </label>
+        </div>
+
+        {/* ======================================================
+            TASK DELETED
+        ====================================================== */}
+
+        <div className="settings-option">
+          <div>
+            <strong>Task Deleted</strong>
+
+            <p>Notify me when a task is deleted.</p>
+          </div>
+
+          <label className="switch">
+            <input
+              type="checkbox"
+              checked={settings.task_deleted_notifications}
+              onChange={() =>
+                handleNotificationChange('task_deleted_notifications')
+              }
+              disabled={settingsLoading}
+            />
+
+            <span className="slider"></span>
+          </label>
+        </div>
       </section>
 
-      {/* SECURITY */}
+      {/* ========================================================
+          SECURITY
+      ======================================================== */}
 
       <section className="settings-card">
         <div className="settings-card-title">
@@ -424,21 +571,11 @@ function Settings() {
             Change Password
           </button>
         </div>
-
-        <div className="settings-option">
-          <div>
-            <strong>Two-Factor Authentication</strong>
-
-            <p>Add an extra layer of security to your account.</p>
-          </div>
-
-          <button type="button" className="settings-button">
-            Enable
-          </button>
-        </div>
       </section>
 
-      {/* ACCOUNT */}
+      {/* ========================================================
+          ACCOUNT
+      ======================================================== */}
 
       <section className="settings-card danger-zone">
         <div className="settings-card-title">
@@ -457,7 +594,9 @@ function Settings() {
         </button>
       </section>
 
-      {/* CHANGE PASSWORD MODAL */}
+      {/* ========================================================
+          CHANGE PASSWORD MODAL
+      ======================================================== */}
 
       {showPasswordModal && (
         <div className="password-modal-overlay">
@@ -466,6 +605,8 @@ function Settings() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="password-modal-title">
+            {/* MODAL HEADER */}
+
             <div className="password-modal-header">
               <div className="password-modal-title">
                 <MdLock />
@@ -483,10 +624,14 @@ function Settings() {
               </button>
             </div>
 
+            {/* DESCRIPTION */}
+
             <p className="password-modal-description">
               Enter your current password and choose a new password for your
               account.
             </p>
+
+            {/* FORM */}
 
             <form onSubmit={handleChangePassword}>
               {/* CURRENT PASSWORD */}

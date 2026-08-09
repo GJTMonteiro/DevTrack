@@ -22,6 +22,10 @@ function Sidebar() {
 
   const [profile, setProfile] = useState<ProfileData | null>(null);
 
+  // ==========================
+  // LOAD PROFILE
+  // ==========================
+
   useEffect(() => {
     async function loadProfile() {
       try {
@@ -33,8 +37,27 @@ function Sidebar() {
       }
     }
 
+    // Carregar perfil ao abrir o Sidebar
     loadProfile();
+
+    // ==========================
+    // PROFILE UPDATED EVENT
+    // ==========================
+
+    function handleProfileUpdated() {
+      loadProfile();
+    }
+
+    window.addEventListener('profile-updated', handleProfileUpdated);
+
+    return () => {
+      window.removeEventListener('profile-updated', handleProfileUpdated);
+    };
   }, []);
+
+  // ==========================
+  // LOGOUT
+  // ==========================
 
   function handleLogout() {
     localStorage.removeItem('token');
@@ -50,13 +73,25 @@ function Sidebar() {
 
   return (
     <aside className="sidebar">
-      <div className="sidebar-logo">
-        <NavLink to="/dashboard" className="sidebar-logo-link">
-          <img src={getAvatar(profile?.avatar)} alt="DevTrack avatar" />
+      {/* ==========================
+          LOGO / BRAND
+      ========================== */}
+
+      <div className="sidebar-brand">
+        <NavLink to="/dashboard" className="sidebar-brand-link">
+          <img
+            src={getAvatar(profile?.avatar ?? null)}
+            alt="Profile avatar"
+            className="sidebar-avatar"
+          />
 
           <span>DevTrack</span>
         </NavLink>
       </div>
+
+      {/* ==========================
+          NAVIGATION
+      ========================== */}
 
       <nav className="sidebar-nav">
         <ul className="sidebar-menu">
@@ -101,6 +136,10 @@ function Sidebar() {
           </li>
         </ul>
       </nav>
+
+      {/* ==========================
+          LOGOUT
+      ========================== */}
 
       <div className="sidebar-footer">
         <button type="button" className="sidebar-logout" onClick={handleLogout}>

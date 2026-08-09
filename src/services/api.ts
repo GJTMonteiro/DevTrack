@@ -21,11 +21,37 @@ async function apiFetch(endpoint: string, options: RequestInit = {}) {
     },
   });
 
-  const data = await response.json();
+  // =========================
+  // READ RESPONSE
+  // =========================
+
+  const contentType = response.headers.get('content-type');
+
+  let data: any;
+
+  if (contentType?.includes('application/json')) {
+    data = await response.json();
+  } else {
+    const text = await response.text();
+
+    data = {
+      message: text || `Request failed with status ${response.status}`,
+    };
+  }
+
+  // =========================
+  // ERROR
+  // =========================
 
   if (!response.ok) {
-    throw new Error(data.message || 'Something went wrong');
+    throw new Error(
+      data?.message || `Request failed with status ${response.status}`,
+    );
   }
+
+  // =========================
+  // SUCCESS
+  // =========================
 
   return data;
 }

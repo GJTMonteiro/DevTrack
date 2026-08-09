@@ -7,6 +7,8 @@ import taskRoutes from './routes/task.routes.js';
 import skillRoutes from './routes/skill.routes.js';
 import profileRoutes from './routes/profile.routes.js';
 import notificationRoutes from './routes/notification.routes.js';
+import settingsRoutes from './routes/settings.routes.js';
+import activityRoutes from './routes/activity.routes.js';
 
 const app = express();
 
@@ -42,6 +44,10 @@ app.use('/api/skills', skillRoutes);
 app.use('/api/profile', profileRoutes);
 
 app.use('/api/notifications', notificationRoutes);
+
+app.use('/api/settings', settingsRoutes);
+
+app.use('/api/activities', activityRoutes);
 
 // =========================
 // EXPORT

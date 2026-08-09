@@ -78,17 +78,39 @@ export async function updateProfile(req: AuthRequest, res: Response) {
     const { name, username, email, avatar, role, country, country_code, bio } =
       req.body;
 
-    // Validar avatar
-    if (avatar !== null && avatar !== undefined && !AVATARS.includes(avatar)) {
+    // ==========================
+    // VALIDATIONS
+    // ==========================
+
+    if (!name || !name.trim()) {
       return res.status(400).json({
-        message: 'Invalid avatar',
+        message: 'Name is required',
       });
+    }
+
+    if (!username || !username.trim()) {
+      return res.status(400).json({
+        message: 'Username is required',
+      });
+    }
+
+    if (!email || !email.trim()) {
+      return res.status(400).json({
+        message: 'Email is required',
+      });
+    }
+
+    if (avatar !== null && avatar !== undefined) {
+      if (!AVATARS.includes(avatar)) {
+        return res.status(400).json({
+          message: 'Invalid avatar',
+        });
+      }
     }
 
     const result = await pool.query(
       `
       UPDATE users
-
       SET
         name = $1,
         username = $2,
@@ -99,9 +121,7 @@ export async function updateProfile(req: AuthRequest, res: Response) {
         country_code = $7,
         bio = $8,
         updated_at = CURRENT_TIMESTAMP
-
       WHERE id = $9
-
       RETURNING
         id,
         name,
@@ -115,14 +135,14 @@ export async function updateProfile(req: AuthRequest, res: Response) {
         created_at;
       `,
       [
-        name,
-        username,
-        email,
+        name.trim(),
+        username.trim(),
+        email.trim(),
         avatar ?? null,
-        role,
-        country,
-        country_code,
-        bio,
+        role ?? null,
+        country ?? null,
+        country_code ?? null,
+        bio ?? null,
         userId,
       ],
     );
@@ -162,26 +182,40 @@ export async function changePassword(req: AuthRequest, res: Response) {
 
     const { currentPassword, newPassword } = req.body;
 
-    // Verificar se os campos foram enviados
+    // ==========================
+    // VALIDATE INPUT
+    // ==========================
+
     if (!currentPassword || !newPassword) {
       return res.status(400).json({
         message: 'Current password and new password are required',
       });
     }
 
-    // Verificar tamanho da nova password
+    if (
+      typeof currentPassword !== 'string' ||
+      typeof newPassword !== 'string'
+    ) {
+      return res.status(400).json({
+        message: 'Passwords must be strings',
+      });
+    }
+
     if (newPassword.length < 8) {
       return res.status(400).json({
         message: 'New password must contain at least 8 characters',
       });
     }
 
-    // Procurar password atual do utilizador
+    // ==========================
+    // GET CURRENT PASSWORD
+    // ==========================
+
     const result = await pool.query(
       `
       SELECT password_hash
       FROM users
-      WHERE id = $1
+      WHERE id = $1;
       `,
       [userId],
     );
@@ -194,7 +228,10 @@ export async function changePassword(req: AuthRequest, res: Response) {
 
     const user = result.rows[0];
 
-    // Comparar password atual
+    // ==========================
+    // VERIFY CURRENT PASSWORD
+    // ==========================
+
     const passwordMatch = await bcrypt.compare(
       currentPassword,
       user.password_hash,
@@ -206,7 +243,10 @@ export async function changePassword(req: AuthRequest, res: Response) {
       });
     }
 
-    // Verificar se a nova password é igual à atual
+    // ==========================
+    // CHECK SAME PASSWORD
+    // ==========================
+
     const samePassword = await bcrypt.compare(newPassword, user.password_hash);
 
     if (samePassword) {
@@ -215,17 +255,23 @@ export async function changePassword(req: AuthRequest, res: Response) {
       });
     }
 
-    // Criar hash da nova password
+    // ==========================
+    // HASH NEW PASSWORD
+    // ==========================
+
     const newPasswordHash = await bcrypt.hash(newPassword, 10);
 
-    // Atualizar password na base de dados
+    // ==========================
+    // UPDATE PASSWORD
+    // ==========================
+
     await pool.query(
       `
       UPDATE users
       SET
         password_hash = $1,
         updated_at = CURRENT_TIMESTAMP
-      WHERE id = $2
+      WHERE id = $2;
       `,
       [newPasswordHash, userId],
     );

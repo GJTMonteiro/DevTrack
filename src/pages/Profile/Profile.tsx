@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import './Profile.css';
 
 import ProfileModal from '../../components/ProfileModal/ProfileModal';
+import ChangePasswordModal from '../../components/ChangePasswordModal/ChangePasswordModal';
 
 import { getAvatar } from '../../utils/avatars';
 
@@ -14,6 +15,9 @@ import {
   MdTaskAlt,
   MdCheckCircle,
   MdTrendingUp,
+  MdCreateNewFolder,
+  MdEdit,
+  MdDelete,
 } from 'react-icons/md';
 
 import StatCard from '../Dashboard/StatCard';
@@ -26,6 +30,22 @@ import type { Project } from '../../types/project';
 
 import Skills from '../../components/Skills/Skills';
 
+// ============================================================
+// ACTIVITY TYPE
+// ============================================================
+
+interface Activity {
+  id: number;
+  type: string;
+  title: string;
+  description: string;
+  created_at: string;
+}
+
+// ============================================================
+// PROFILE
+// ============================================================
+
 function Profile() {
   const navigate = useNavigate();
 
@@ -33,7 +53,15 @@ function Profile() {
 
   const [profile, setProfile] = useState<ProfileData | null>(null);
 
+  const [activities, setActivities] = useState<Activity[]>([]);
+
   const [showProfileModal, setShowProfileModal] = useState(false);
+
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+
+  // ============================================================
+  // LOAD PROFILE + PROJECTS + ACTIVITIES
+  // ============================================================
 
   useEffect(() => {
     async function loadProfile() {
@@ -56,16 +84,80 @@ function Profile() {
       }
     }
 
-    loadProfile();
+    async function loadActivities() {
+      try {
+        const token = localStorage.getItem('token');
 
+        if (!token) {
+          return;
+        }
+
+        const response = await fetch('http://localhost:3000/api/activities', {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to load activities');
+        }
+
+        const data = await response.json();
+
+        setActivities(data.activities);
+      } catch (error) {
+        console.error('Error loading activities:', error);
+      }
+    }
+
+    loadProfile();
     loadProjects();
+    loadActivities();
   }, []);
 
-  function handleEditProfile() {
-    console.log('EDIT CLICK');
+  // ============================================================
+  // EDIT PROFILE
+  // ============================================================
 
+  function handleEditProfile() {
     setShowProfileModal(true);
   }
+
+  // ============================================================
+  // PROFILE UPDATED
+  // ============================================================
+
+  async function handleProfileUpdated() {
+    try {
+      const data = await getProfile();
+
+      setProfile(data);
+    } catch (error) {
+      console.error('Error refreshing profile:', error);
+    }
+  }
+
+  // ============================================================
+  // CHANGE PASSWORD
+  // ============================================================
+
+  function handleChangePassword() {
+    setShowPasswordModal(true);
+  }
+
+  // ============================================================
+  // NOTIFICATIONS
+  // ============================================================
+
+  function handleNotifications() {
+    navigate('/settings');
+  }
+
+  // ============================================================
+  // LOGOUT
+  // ============================================================
 
   function handleLogout() {
     localStorage.removeItem('token');
@@ -79,37 +171,110 @@ function Profile() {
     });
   }
 
-  if (!profile) {
-    return <div>Loading profile...</div>;
+  // ============================================================
+  // FORMAT ACTIVITY TIME
+  // ============================================================
+
+  function formatActivityTime(date: string) {
+    const activityDate = new Date(date);
+    const now = new Date();
+
+    const difference = now.getTime() - activityDate.getTime();
+
+    const seconds = Math.floor(difference / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    if (seconds < 60) {
+      return 'Just now';
+    }
+
+    if (minutes < 60) {
+      return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'} ago`;
+    }
+
+    if (hours < 24) {
+      return `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`;
+    }
+
+    if (days === 1) {
+      return 'Yesterday';
+    }
+
+    if (days < 7) {
+      return `${days} days ago`;
+    }
+
+    return activityDate.toLocaleDateString();
   }
+
+  // ============================================================
+  // ACTIVITY ICON
+  // ============================================================
+
+  function getActivityIcon(type: string) {
+    switch (type) {
+      case 'project_created':
+      case 'task_created':
+        return <MdCreateNewFolder />;
+
+      case 'project_updated':
+      case 'task_updated':
+        return <MdEdit />;
+
+      case 'project_deleted':
+      case 'task_deleted':
+        return <MdDelete />;
+
+      default:
+        return <MdCheckCircle />;
+    }
+  }
+
+  // ============================================================
+  // LOADING
+  // ============================================================
+
+  if (!profile) {
+    return <div className="profile-loading">Loading profile...</div>;
+  }
+
+  // ============================================================
+  // PROFILE DETAILS
+  // ============================================================
 
   const details = [
     {
       label: 'Username',
       value: profile.username,
     },
-
     {
       label: 'Country',
       value: profile.country,
     },
-
     {
       label: 'Member Since',
       value: 'August 2026',
     },
   ];
 
+  // ============================================================
+  // RENDER
+  // ============================================================
+
   return (
     <section className="profile-content">
+      {/* ==========================
+          PROFILE HEADER
+      ========================== */}
+
       <div className="profile-header">
-        <div className="profile-avatar-wrapper">
-          <img
-            src={getAvatar(profile.avatar)}
-            alt={`${profile.name}'s avatar`}
-            className="profile-avatar"
-          />
-        </div>
+        <img
+          src={getAvatar(profile.avatar)}
+          alt={`${profile.name}'s avatar`}
+          className="profile-avatar"
+        />
 
         <div className="profile-info">
           <h1 className="profile-name">
@@ -140,6 +305,10 @@ function Profile() {
         </button>
       </div>
 
+      {/* ==========================
+          PROFILE DETAILS
+      ========================== */}
+
       <div className="profile-details">
         <h2>Profile Details</h2>
 
@@ -151,6 +320,10 @@ function Profile() {
           </div>
         ))}
       </div>
+
+      {/* ==========================
+          PROFILE STATS
+      ========================== */}
 
       <div className="profile-stats">
         <StatCard
@@ -182,21 +355,49 @@ function Profile() {
         />
       </div>
 
+      {/* ==========================
+          SKILLS
+      ========================== */}
+
       <Skills />
+
+      {/* ==========================
+          RECENT ACTIVITY
+      ========================== */}
 
       <div className="profile-activity">
         <h2>Recent Activity</h2>
 
-        <ul>
-          <li>Created DevTrack</li>
+        {activities.length === 0 ? (
+          <div className="profile-activity-empty">
+            <MdCheckCircle />
 
-          <li>Completed 8 tasks</li>
+            <p>No recent activity yet.</p>
+          </div>
+        ) : (
+          <ul>
+            {activities.map((activity) => (
+              <li key={activity.id}>
+                <div className="activity-icon">
+                  {getActivityIcon(activity.type)}
+                </div>
 
-          <li>Updated profile</li>
+                <div className="activity-content">
+                  <strong>{activity.title}</strong>
 
-          <li>Joined workspace</li>
-        </ul>
+                  <p>{activity.description}</p>
+
+                  <span>{formatActivityTime(activity.created_at)}</span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
+
+      {/* ==========================
+          ACCOUNT ACTIONS
+      ========================== */}
 
       <div className="profile-actions">
         <h2>Account</h2>
@@ -209,15 +410,15 @@ function Profile() {
           </li>
 
           <li>
-            <button type="button">Change Password</button>
+            <button type="button" onClick={handleChangePassword}>
+              Change Password
+            </button>
           </li>
 
           <li>
-            <button type="button">Security</button>
-          </li>
-
-          <li>
-            <button type="button">Notifications</button>
+            <button type="button" onClick={handleNotifications}>
+              Notifications
+            </button>
           </li>
 
           <li>
@@ -228,8 +429,23 @@ function Profile() {
         </ul>
       </div>
 
+      {/* ==========================
+          EDIT PROFILE MODAL
+      ========================== */}
+
       {showProfileModal && (
-        <ProfileModal onClose={() => setShowProfileModal(false)} />
+        <ProfileModal
+          onClose={() => setShowProfileModal(false)}
+          onUpdated={handleProfileUpdated}
+        />
+      )}
+
+      {/* ==========================
+          CHANGE PASSWORD MODAL
+      ========================== */}
+
+      {showPasswordModal && (
+        <ChangePasswordModal onClose={() => setShowPasswordModal(false)} />
       )}
     </section>
   );

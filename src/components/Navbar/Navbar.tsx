@@ -28,11 +28,8 @@ function Navbar() {
   const { theme, toggleTheme } = useTheme();
 
   const [notifications, setNotifications] = useState<NotificationData[]>([]);
-
   const [unreadCount, setUnreadCount] = useState(0);
-
   const [showNotifications, setShowNotifications] = useState(false);
-
   const [loadingNotifications, setLoadingNotifications] = useState(false);
 
   // =========================
@@ -49,7 +46,6 @@ function Navbar() {
       ]);
 
       console.log('🔔 NOTIFICATIONS LOADED:', notificationData);
-
       console.log('🔴 UNREAD COUNT:', count);
 
       setNotifications(notificationData);
