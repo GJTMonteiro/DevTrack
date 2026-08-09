@@ -5,6 +5,12 @@ import { useNavigate } from 'react-router-dom';
 
 import { getProfile, type ProfileData } from '../../services/profile.service';
 
+import {
+  getSettings,
+  updateSettings,
+  type SettingsData,
+} from '../../services/settings.service';
+
 import { useTheme } from '../../components/context/ThemeContext';
 
 import {
@@ -12,9 +18,9 @@ import {
   MdDarkMode,
   MdNotifications,
   MdSecurity,
-  MdPalette,
-  MdStorage,
   MdLogout,
+  MdLock,
+  MdClose,
 } from 'react-icons/md';
 
 function Settings() {
@@ -24,10 +30,27 @@ function Settings() {
 
   const [profile, setProfile] = useState<ProfileData | null>(null);
 
-  const [emailNotifications, setEmailNotifications] = useState(true);
-  const [taskNotifications, setTaskNotifications] = useState(true);
-  const [weeklyReport, setWeeklyReport] = useState(false);
+  // NOTIFICATIONS
+  const [settings, setSettings] = useState<SettingsData>({
+    project_created_notifications: true,
+    project_updated_notifications: true,
+    project_deleted_notifications: true,
+  });
 
+  const [settingsLoading, setSettingsLoading] = useState(false);
+
+  // CHANGE PASSWORD
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordSuccess, setPasswordSuccess] = useState('');
+
+  // LOAD PROFILE + SETTINGS
   useEffect(() => {
     async function loadProfile() {
       try {
@@ -39,9 +62,21 @@ function Settings() {
       }
     }
 
+    async function loadSettings() {
+      try {
+        const data = await getSettings();
+
+        setSettings(data);
+      } catch (error) {
+        console.error('Error loading settings:', error);
+      }
+    }
+
     loadProfile();
+    loadSettings();
   }, []);
 
+  // LOGOUT
   function handleLogout() {
     localStorage.removeItem('token');
     localStorage.removeItem('userName');
@@ -50,7 +85,154 @@ function Settings() {
 
     sessionStorage.removeItem('token');
 
-    navigate('/login');
+    navigate('/login', {
+      replace: true,
+    });
+  }
+
+  // OPEN PASSWORD MODAL
+  function handleOpenPasswordModal() {
+    setCurrentPassword('');
+    setNewPassword('');
+    setConfirmPassword('');
+
+    setPasswordError('');
+    setPasswordSuccess('');
+
+    setShowPasswordModal(true);
+  }
+
+  // CLOSE PASSWORD MODAL
+  function handleClosePasswordModal() {
+    if (passwordLoading) {
+      return;
+    }
+
+    setShowPasswordModal(false);
+
+    setCurrentPassword('');
+    setNewPassword('');
+    setConfirmPassword('');
+
+    setPasswordError('');
+    setPasswordSuccess('');
+  }
+
+  // CHANGE PASSWORD
+  async function handleChangePassword(event: React.FormEvent) {
+    event.preventDefault();
+
+    setPasswordError('');
+    setPasswordSuccess('');
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      setPasswordError('Please fill in all fields.');
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      setPasswordError('The new password must contain at least 8 characters.');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setPasswordError('The new passwords do not match.');
+      return;
+    }
+
+    if (currentPassword === newPassword) {
+      setPasswordError(
+        'The new password must be different from the current password.',
+      );
+      return;
+    }
+
+    try {
+      setPasswordLoading(true);
+
+      const token = localStorage.getItem('token');
+
+      const response = await fetch(
+        'http://localhost:3000/api/profile/password',
+        {
+          method: 'PUT',
+
+          headers: {
+            'Content-Type': 'application/json',
+
+            ...(token && {
+              Authorization: `Bearer ${token}`,
+            }),
+          },
+
+          body: JSON.stringify({
+            currentPassword,
+            newPassword,
+          }),
+        },
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to change password.');
+      }
+
+      setPasswordSuccess('Password changed successfully.');
+
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+
+      setTimeout(() => {
+        setShowPasswordModal(false);
+        setPasswordSuccess('');
+      }, 1500);
+    } catch (error) {
+      console.error('CHANGE PASSWORD ERROR:', error);
+
+      if (error instanceof Error) {
+        setPasswordError(error.message);
+      } else {
+        setPasswordError('Something went wrong.');
+      }
+    } finally {
+      setPasswordLoading(false);
+    }
+  }
+
+  // UPDATE NOTIFICATION SETTING
+  async function handleNotificationChange(setting: keyof SettingsData) {
+    const previousSettings = settings;
+
+    const updatedSettings: SettingsData = {
+      ...settings,
+      [setting]: !settings[setting],
+    };
+
+    // Atualização imediata no UI
+    setSettings(updatedSettings);
+
+    try {
+      setSettingsLoading(true);
+
+      const data = await updateSettings(updatedSettings);
+
+      setSettings(data);
+    } catch (error) {
+      console.error('UPDATE SETTINGS ERROR:', error);
+
+      // Reverter se a API falhar
+      setSettings(previousSettings);
+
+      if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert('Failed to update settings.');
+      }
+    } finally {
+      setSettingsLoading(false);
+    }
   }
 
   const fullName = profile?.name || 'Developer';
@@ -138,19 +320,6 @@ function Settings() {
             </label>
           </div>
         </div>
-
-        <div className="settings-option">
-          <div>
-            <strong>Accent Color</strong>
-
-            <p>Personalize the primary application color.</p>
-          </div>
-
-          <button className="settings-button">
-            <MdPalette />
-            Customize
-          </button>
-        </div>
       </section>
 
       {/* NOTIFICATIONS */}
@@ -162,54 +331,69 @@ function Settings() {
           <h2>Notifications</h2>
         </div>
 
+        {/* PROJECT CREATED */}
+
         <div className="settings-option">
           <div>
-            <strong>Email Notifications</strong>
+            <strong>Project Created</strong>
 
-            <p>Receive updates directly in your inbox.</p>
+            <p>Notify me when a new project is created.</p>
           </div>
 
           <label className="switch">
             <input
               type="checkbox"
-              checked={emailNotifications}
-              onChange={() => setEmailNotifications(!emailNotifications)}
+              checked={settings.project_created_notifications}
+              onChange={() =>
+                handleNotificationChange('project_created_notifications')
+              }
+              disabled={settingsLoading}
             />
 
             <span className="slider"></span>
           </label>
         </div>
 
+        {/* PROJECT UPDATED */}
+
         <div className="settings-option">
           <div>
-            <strong>Task Reminders</strong>
+            <strong>Project Updated</strong>
 
-            <p>Notify me when deadlines are approaching.</p>
+            <p>Notify me when a project is updated.</p>
           </div>
 
           <label className="switch">
             <input
               type="checkbox"
-              checked={taskNotifications}
-              onChange={() => setTaskNotifications(!taskNotifications)}
+              checked={settings.project_updated_notifications}
+              onChange={() =>
+                handleNotificationChange('project_updated_notifications')
+              }
+              disabled={settingsLoading}
             />
 
             <span className="slider"></span>
           </label>
         </div>
 
+        {/* PROJECT DELETED */}
+
         <div className="settings-option">
           <div>
-            <strong>Weekly Productivity Report</strong>
+            <strong>Project Deleted</strong>
 
-            <p>Receive a summary every week.</p>
+            <p>Notify me when a project is deleted.</p>
           </div>
 
           <label className="switch">
             <input
               type="checkbox"
-              checked={weeklyReport}
-              onChange={() => setWeeklyReport(!weeklyReport)}
+              checked={settings.project_deleted_notifications}
+              onChange={() =>
+                handleNotificationChange('project_deleted_notifications')
+              }
+              disabled={settingsLoading}
             />
 
             <span className="slider"></span>
@@ -233,7 +417,12 @@ function Settings() {
             <p>Change your account password.</p>
           </div>
 
-          <button className="settings-button">Change Password</button>
+          <button
+            type="button"
+            className="settings-button"
+            onClick={handleOpenPasswordModal}>
+            Change Password
+          </button>
         </div>
 
         <div className="settings-option">
@@ -243,37 +432,9 @@ function Settings() {
             <p>Add an extra layer of security to your account.</p>
           </div>
 
-          <button className="settings-button">Enable</button>
-        </div>
-      </section>
-
-      {/* WORKSPACE */}
-
-      <section className="settings-card">
-        <div className="settings-card-title">
-          <MdStorage />
-
-          <h2>Workspace</h2>
-        </div>
-
-        <div className="settings-option">
-          <div>
-            <strong>Export Data</strong>
-
-            <p>Download your projects and tasks.</p>
-          </div>
-
-          <button className="settings-button">Export</button>
-        </div>
-
-        <div className="settings-option">
-          <div>
-            <strong>Clear Cache</strong>
-
-            <p>Remove temporary application data.</p>
-          </div>
-
-          <button className="settings-button">Clear</button>
+          <button type="button" className="settings-button">
+            Enable
+          </button>
         </div>
       </section>
 
@@ -290,11 +451,127 @@ function Settings() {
           Logging out will end your current session on this device.
         </p>
 
-        <button className="logout-button" onClick={handleLogout}>
+        <button type="button" className="logout-button" onClick={handleLogout}>
           <MdLogout />
           Logout
         </button>
       </section>
+
+      {/* CHANGE PASSWORD MODAL */}
+
+      {showPasswordModal && (
+        <div className="password-modal-overlay">
+          <div
+            className="password-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="password-modal-title">
+            <div className="password-modal-header">
+              <div className="password-modal-title">
+                <MdLock />
+
+                <h2 id="password-modal-title">Change Password</h2>
+              </div>
+
+              <button
+                type="button"
+                className="password-modal-close"
+                onClick={handleClosePasswordModal}
+                disabled={passwordLoading}
+                aria-label="Close">
+                <MdClose />
+              </button>
+            </div>
+
+            <p className="password-modal-description">
+              Enter your current password and choose a new password for your
+              account.
+            </p>
+
+            <form onSubmit={handleChangePassword}>
+              {/* CURRENT PASSWORD */}
+
+              <div className="settings-group">
+                <label htmlFor="current-password">Current Password</label>
+
+                <input
+                  id="current-password"
+                  type="password"
+                  value={currentPassword}
+                  onChange={(event) => setCurrentPassword(event.target.value)}
+                  disabled={passwordLoading}
+                  autoComplete="current-password"
+                />
+              </div>
+
+              {/* NEW PASSWORD */}
+
+              <div className="settings-group">
+                <label htmlFor="new-password">New Password</label>
+
+                <input
+                  id="new-password"
+                  type="password"
+                  value={newPassword}
+                  onChange={(event) => setNewPassword(event.target.value)}
+                  disabled={passwordLoading}
+                  autoComplete="new-password"
+                />
+              </div>
+
+              {/* CONFIRM PASSWORD */}
+
+              <div className="settings-group">
+                <label htmlFor="confirm-password">Confirm New Password</label>
+
+                <input
+                  id="confirm-password"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(event) => setConfirmPassword(event.target.value)}
+                  disabled={passwordLoading}
+                  autoComplete="new-password"
+                />
+              </div>
+
+              {/* ERROR */}
+
+              {passwordError && (
+                <p className="password-message password-error">
+                  {passwordError}
+                </p>
+              )}
+
+              {/* SUCCESS */}
+
+              {passwordSuccess && (
+                <p className="password-message password-success">
+                  {passwordSuccess}
+                </p>
+              )}
+
+              {/* ACTIONS */}
+
+              <div className="password-modal-actions">
+                <button
+                  type="button"
+                  className="password-cancel-button"
+                  onClick={handleClosePasswordModal}
+                  disabled={passwordLoading}>
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  className="settings-button"
+                  disabled={passwordLoading}>
+                  {passwordLoading ? 'Changing...' : 'Change Password'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

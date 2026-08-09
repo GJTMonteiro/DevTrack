@@ -1,11 +1,19 @@
 import { Response } from 'express';
+import bcrypt from 'bcrypt';
+
 import pool from '../config/database.js';
 import { AuthRequest } from '../middleware/auth.middleware.js';
 
-// Avatars disponíveis
+// ==========================
+// AVATARS DISPONÍVEIS
+// ==========================
+
 const AVATARS = ['avatar-1', 'avatar-2', 'avatar-3', 'avatar-4'] as const;
 
+// ==========================
 // GET PROFILE
+// ==========================
+
 export async function getProfile(req: AuthRequest, res: Response) {
   try {
     const userId = req.user?.id;
@@ -53,7 +61,10 @@ export async function getProfile(req: AuthRequest, res: Response) {
   }
 }
 
+// ==========================
 // UPDATE PROFILE
+// ==========================
+
 export async function updateProfile(req: AuthRequest, res: Response) {
   try {
     const userId = req.user?.id;
@@ -128,6 +139,102 @@ export async function updateProfile(req: AuthRequest, res: Response) {
     });
   } catch (error) {
     console.error('UPDATE PROFILE ERROR:', error);
+
+    return res.status(500).json({
+      message: 'Internal server error',
+    });
+  }
+}
+
+// ==========================
+// CHANGE PASSWORD
+// ==========================
+
+export async function changePassword(req: AuthRequest, res: Response) {
+  try {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({
+        message: 'Unauthorized',
+      });
+    }
+
+    const { currentPassword, newPassword } = req.body;
+
+    // Verificar se os campos foram enviados
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({
+        message: 'Current password and new password are required',
+      });
+    }
+
+    // Verificar tamanho da nova password
+    if (newPassword.length < 8) {
+      return res.status(400).json({
+        message: 'New password must contain at least 8 characters',
+      });
+    }
+
+    // Procurar password atual do utilizador
+    const result = await pool.query(
+      `
+      SELECT password_hash
+      FROM users
+      WHERE id = $1
+      `,
+      [userId],
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        message: 'User not found',
+      });
+    }
+
+    const user = result.rows[0];
+
+    // Comparar password atual
+    const passwordMatch = await bcrypt.compare(
+      currentPassword,
+      user.password_hash,
+    );
+
+    if (!passwordMatch) {
+      return res.status(400).json({
+        message: 'Current password is incorrect',
+      });
+    }
+
+    // Verificar se a nova password é igual à atual
+    const samePassword = await bcrypt.compare(newPassword, user.password_hash);
+
+    if (samePassword) {
+      return res.status(400).json({
+        message: 'New password must be different from the current password',
+      });
+    }
+
+    // Criar hash da nova password
+    const newPasswordHash = await bcrypt.hash(newPassword, 10);
+
+    // Atualizar password na base de dados
+    await pool.query(
+      `
+      UPDATE users
+      SET
+        password_hash = $1,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = $2
+      `,
+      [newPasswordHash, userId],
+    );
+
+    return res.status(200).json({
+      message: 'Password changed successfully',
+    });
+  } catch (error) {
+    console.error('CHANGE PASSWORD ERROR:', error);
 
     return res.status(500).json({
       message: 'Internal server error',

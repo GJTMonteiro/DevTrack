@@ -12,7 +12,12 @@ interface CreateProjectResponse {
 }
 
 interface UpdateProjectResponse {
+  message?: string;
   project: Project;
+}
+
+interface DeleteProjectResponse {
+  message: string;
 }
 
 interface ErrorResponse {
@@ -28,7 +33,6 @@ export async function getProjects(): Promise<ProjectsResponse> {
 
   const response = await fetch(API_URL, {
     method: 'GET',
-
     headers: {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
@@ -131,7 +135,7 @@ export async function updateProject(
 
 export async function deleteProject(
   projectId: number,
-): Promise<{ message: string }> {
+): Promise<DeleteProjectResponse> {
   const token = localStorage.getItem('token');
 
   const response = await fetch(`${API_URL}/${projectId}`, {
@@ -143,7 +147,7 @@ export async function deleteProject(
     },
   });
 
-  const data = (await response.json()) as { message: string } | ErrorResponse;
+  const data = (await response.json()) as DeleteProjectResponse | ErrorResponse;
 
   if (!response.ok) {
     throw new Error(
@@ -153,5 +157,5 @@ export async function deleteProject(
     );
   }
 
-  return data as { message: string };
+  return data as DeleteProjectResponse;
 }

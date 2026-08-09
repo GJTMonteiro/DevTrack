@@ -3,12 +3,13 @@ import './Projects.css';
 import { useEffect, useState } from 'react';
 
 import ProjectCard from '../../components/Project/ProjectCard';
-
 import ProjectModal from '../../components/ProjectModal/ProjectModal';
 
 import { getProjects, deleteProject } from '../../services/project.service';
 
 import type { Project } from '../../types/project';
+
+import { notifyNotificationsUpdated } from '../../utils/notificationEvents';
 
 function Projects() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -16,6 +17,10 @@ function Projects() {
   const [showModal, setShowModal] = useState(false);
 
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+
+  // =========================
+  // LOAD PROJECTS
+  // =========================
 
   async function loadProjects() {
     try {
@@ -25,32 +30,66 @@ function Projects() {
 
       setProjects(data.projects);
     } catch (error) {
-      console.error('Error loading projects:', error);
+      console.error('ERROR LOADING PROJECTS:', error);
     }
   }
+
+  // =========================
+  // INITIAL LOAD
+  // =========================
 
   useEffect(() => {
     loadProjects();
   }, []);
 
+  // =========================
+  // CREATE PROJECT
+  // =========================
 
   function handleCreateProject() {
     setSelectedProject(null);
-
     setShowModal(true);
   }
+
+  // =========================
+  // EDIT PROJECT
+  // =========================
 
   function handleEditProject(project: Project) {
     setSelectedProject(project);
-
     setShowModal(true);
   }
 
+  // =========================
+  // PROJECT CREATED / UPDATED
+  // =========================
+
+  async function handleProjectSaved() {
+    try {
+      // Atualizar lista de projetos
+      await loadProjects();
+
+      // Atualizar Navbar / notificações
+      notifyNotificationsUpdated();
+    } catch (error) {
+      console.error('PROJECT SAVED ERROR:', error);
+    }
+  }
+
+  // =========================
+  // DELETE PROJECT
+  // =========================
+
   async function handleDeleteProject(projectId: number) {
     try {
+      // Eliminar projeto no backend
       await deleteProject(projectId);
 
+      // Atualizar lista de projetos
       await loadProjects();
+
+      // Atualizar Navbar / notificações
+      notifyNotificationsUpdated();
     } catch (error) {
       console.error('DELETE PROJECT ERROR:', error);
 
@@ -62,14 +101,21 @@ function Projects() {
     }
   }
 
+  // =========================
+  // CLOSE MODAL
+  // =========================
+
   function handleCloseModal() {
     setShowModal(false);
-
     setSelectedProject(null);
   }
 
   return (
-    <section className="projects-page">
+    <section className="projects-content">
+      {/* =========================
+          HEADER
+      ========================= */}
+
       <div className="projects-header">
         <div>
           <h1>Projects</h1>
@@ -84,6 +130,10 @@ function Projects() {
           + New Project
         </button>
       </div>
+
+      {/* =========================
+          SEARCH / FILTERS
+      ========================= */}
 
       <div className="projects-search">
         <input type="text" placeholder="Search projects..." />
@@ -103,6 +153,10 @@ function Projects() {
         </select>
       </div>
 
+      {/* =========================
+          PROJECTS
+      ========================= */}
+
       <div className="projects-container">
         <div className="projects-list">
           {projects.length === 0 ? (
@@ -120,11 +174,15 @@ function Projects() {
         </div>
       </div>
 
+      {/* =========================
+          PROJECT MODAL
+      ========================= */}
+
       {showModal && (
         <ProjectModal
           project={selectedProject}
           onClose={handleCloseModal}
-          onCreated={loadProjects}
+          onCreated={handleProjectSaved}
         />
       )}
     </section>

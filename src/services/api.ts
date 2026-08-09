@@ -7,23 +7,19 @@ function getToken() {
 async function apiFetch(endpoint: string, options: RequestInit = {}) {
   const token = getToken();
 
-  const response = await fetch(
-    `${API_URL}${endpoint}`,
+  const response = await fetch(`${API_URL}${endpoint}`, {
+    ...options,
 
-    {
-      ...options,
+    headers: {
+      'Content-Type': 'application/json',
 
-      headers: {
-        'Content-Type': 'application/json',
+      ...(token && {
+        Authorization: `Bearer ${token}`,
+      }),
 
-        ...(token && {
-          Authorization: `Bearer ${token}`,
-        }),
-
-        ...options.headers,
-      },
+      ...options.headers,
     },
-  );
+  });
 
   const data = await response.json();
 

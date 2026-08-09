@@ -17,6 +17,8 @@
 }
 
 .project-modal {
+  position: relative;
+
   width: 480px;
 
   background: var(--color-surface);
@@ -48,11 +50,92 @@
   }
 }
 
-.project-modal h2 {
-  font-size: 1.8rem;
+/* =========================================================
+   MODAL HEADER
+========================================================= */
+
+.project-modal-header {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  width: 100%;
 
   margin-bottom: 30px;
+
+  gap: 20px;
 }
+
+.project-modal-header h2 {
+  margin: 0;
+
+  font-size: 1.8rem;
+
+  line-height: 1.2;
+}
+
+/* =========================================================
+   CLOSE BUTTON
+========================================================= */
+
+.project-modal-close {
+  position: static;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  width: 36px;
+
+  height: 36px;
+
+  padding: 0;
+
+  border: none;
+
+  border-radius: 10px;
+
+  background: transparent;
+
+  color: var(--color-text);
+
+  font-size: 1.7rem;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.project-modal-close:hover {
+  background: var(--color-hover);
+
+  color: var(--color-text);
+
+  transform: scale(1.05);
+}
+
+.project-modal-close:disabled {
+  opacity: 0.6;
+
+  cursor: not-allowed;
+
+  transform: none;
+}
+
+/* =========================================================
+   FORM
+========================================================= */
 
 .project-modal form {
   display: flex;
@@ -77,10 +160,16 @@
   font-weight: 600;
 }
 
+/* =========================================================
+   INPUTS
+========================================================= */
+
 .project-modal input[type='text'],
 .project-modal textarea,
 .project-modal select {
   width: 100%;
+
+  box-sizing: border-box;
 
   background: var(--color-background);
 
@@ -110,6 +199,14 @@
 
   resize: none;
 }
+
+.project-modal select {
+  cursor: pointer;
+}
+
+/* =========================================================
+   COLOR PICKER
+========================================================= */
 
 .color-picker {
   display: flex;
@@ -141,9 +238,9 @@
   cursor: pointer;
 }
 
-.project-modal select {
-  cursor: pointer;
-}
+/* =========================================================
+   ACTIONS
+========================================================= */
 
 .project-modal-actions {
   display: flex;
@@ -201,10 +298,18 @@
   cursor: not-allowed;
 }
 
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
 @media (max-width: 600px) {
   .project-modal {
     width: calc(100% - 40px);
 
     padding: 25px;
+  }
+
+  .project-modal-header h2 {
+    font-size: 1.5rem;
   }
 }

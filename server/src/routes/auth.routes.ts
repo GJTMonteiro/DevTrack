@@ -1,21 +1,22 @@
-import { Router } from "express";
+import { Router } from 'express';
 
 import {
-    register,
-    login,
-    me,
-} from "../controllers/authcontroller.js";
+  register,
+  login,
+  me,
+  changePassword,
+} from '../controllers/authcontroller.js';
 
-import {
-    authenticateToken
-} from "../middleware/auth.middleware.js";
+import { authenticateToken } from '../middleware/auth.middleware.js';
 
 const router = Router();
 
-router.post("/register", register);
+router.post('/register', register);
 
-router.post("/login", login);
+router.post('/login', login);
 
-router.get("/me", authenticateToken, me);
+router.get('/me', authenticateToken, me);
+
+router.put('/change-password', authenticateToken, changePassword);
 
 export default router;

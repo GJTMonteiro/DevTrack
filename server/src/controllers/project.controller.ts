@@ -2,8 +2,11 @@ import { Response } from 'express';
 
 import pool from '../config/database.js';
 import { AuthRequest } from '../middleware/auth.middleware.js';
+import { createNotification } from '../utils/notification.js';
 
+// ============================================================
 // CREATE PROJECT
+// ============================================================
 
 export async function createProject(req: AuthRequest, res: Response) {
   try {
@@ -11,55 +14,98 @@ export async function createProject(req: AuthRequest, res: Response) {
 
     const userId = req.user?.id;
 
+    // =========================
+    // AUTHENTICATION
+    // =========================
+
     if (!userId) {
       return res.status(401).json({
         message: 'Unauthorized',
       });
     }
 
-    if (!title) {
+    // =========================
+    // VALIDATION
+    // =========================
+
+    if (!title || !title.trim()) {
       return res.status(400).json({
         message: 'Project title is required',
       });
     }
 
+    // =========================
+    // CREATE PROJECT
+    // =========================
+
     const result = await pool.query(
       `
-            INSERT INTO projects
-            (
-                user_id,
-                title,
-                description,
-                color,
-                status,
-                priority
-            )
-
-            VALUES
-            (
-                $1,
-                $2,
-                $3,
-                $4,
-                $5,
-                $6
-            )
-
-            RETURNING *;
-            `,
+        INSERT INTO projects
+        (
+          user_id,
+          title,
+          description,
+          color,
+          status,
+          priority
+        )
+        VALUES ($1, $2, $3, $4, $5, $6)
+        RETURNING *;
+      `,
       [
         userId,
-        title,
-        description ?? '',
+        title.trim(),
+        description?.trim() ?? '',
         color ?? '#3B82F6',
         status ?? 'Planning',
         priority ?? 'Medium',
       ],
     );
 
+    const project = result.rows[0];
+
+    console.log('PROJECT CREATED:', project);
+
+    // =========================
+    // CHECK CREATE NOTIFICATIONS
+    // =========================
+
+    const settingsResult = await pool.query(
+      `
+        SELECT project_created_notifications
+        FROM users
+        WHERE id = $1;
+      `,
+      [userId],
+    );
+
+    const notificationsEnabled =
+      settingsResult.rows[0]?.project_created_notifications === true;
+
+    console.log('PROJECT CREATED NOTIFICATIONS:', notificationsEnabled);
+
+    // =========================
+    // CREATE NOTIFICATION
+    // =========================
+
+    if (notificationsEnabled) {
+      await createNotification(
+        userId,
+        'project_created',
+        'Project Created',
+        `Project "${project.title}" was created successfully.`,
+      );
+
+      console.log('CREATE NOTIFICATION CREATED');
+    }
+
+    // =========================
+    // RESPONSE
+    // =========================
+
     return res.status(201).json({
       message: 'Project created successfully',
-      project: result.rows[0],
+      project,
     });
   } catch (error) {
     console.error('CREATE PROJECT ERROR:', error);
@@ -70,11 +116,17 @@ export async function createProject(req: AuthRequest, res: Response) {
   }
 }
 
+// ============================================================
 // GET ALL USER PROJECTS
+// ============================================================
 
 export async function getProjects(req: AuthRequest, res: Response) {
   try {
     const userId = req.user?.id;
+
+    // =========================
+    // AUTHENTICATION
+    // =========================
 
     if (!userId) {
       return res.status(401).json({
@@ -82,24 +134,25 @@ export async function getProjects(req: AuthRequest, res: Response) {
       });
     }
 
+    // =========================
+    // GET PROJECTS
+    // =========================
+
     const result = await pool.query(
       `
-            SELECT
-                id,
-                title,
-                description,
-                color,
-                status,
-                priority,
-                created_at,
-                updated_at
-
-            FROM projects
-
-            WHERE user_id = $1
-
-            ORDER BY created_at DESC;
-            `,
+        SELECT
+          id,
+          title,
+          description,
+          color,
+          status,
+          priority,
+          created_at,
+          updated_at
+        FROM projects
+        WHERE user_id = $1
+        ORDER BY created_at DESC;
+      `,
       [userId],
     );
 
@@ -115,30 +168,61 @@ export async function getProjects(req: AuthRequest, res: Response) {
   }
 }
 
+// ============================================================
 // GET SINGLE PROJECT
+// ============================================================
 
 export async function getProjectById(req: AuthRequest, res: Response) {
   try {
     const userId = req.user?.id;
     const { id } = req.params;
 
+    // =========================
+    // AUTHENTICATION
+    // =========================
+
+    if (!userId) {
+      return res.status(401).json({
+        message: 'Unauthorized',
+      });
+    }
+
+    // =========================
+    // GET PROJECT
+    // =========================
+
     const result = await pool.query(
       `
-            SELECT *
-
-            FROM projects
-
-            WHERE id = $1
-            AND user_id = $2;
-            `,
+        SELECT
+          id,
+          user_id,
+          title,
+          description,
+          color,
+          status,
+          priority,
+          created_at,
+          updated_at
+        FROM projects
+        WHERE id = $1
+        AND user_id = $2;
+      `,
       [id, userId],
     );
+
+    // =========================
+    // NOT FOUND
+    // =========================
 
     if (result.rows.length === 0) {
       return res.status(404).json({
         message: 'Project not found',
       });
     }
+
+    // =========================
+    // RESPONSE
+    // =========================
 
     return res.status(200).json({
       project: result.rows[0],
@@ -152,14 +236,20 @@ export async function getProjectById(req: AuthRequest, res: Response) {
   }
 }
 
+// ============================================================
 // UPDATE PROJECT
-
-// UPDATE PROJECT
+// ============================================================
 
 export async function updateProject(req: AuthRequest, res: Response) {
   try {
     const userId = req.user?.id;
     const { id } = req.params;
+
+    const { title, description, color, status, priority } = req.body;
+
+    // =========================
+    // AUTHENTICATION
+    // =========================
 
     if (!userId) {
       return res.status(401).json({
@@ -167,18 +257,23 @@ export async function updateProject(req: AuthRequest, res: Response) {
       });
     }
 
-    const { title, description, color, status, priority } = req.body;
+    // =========================
+    // VALIDATION
+    // =========================
 
-    if (!title) {
+    if (!title || !title.trim()) {
       return res.status(400).json({
         message: 'Project title is required',
       });
     }
 
+    // =========================
+    // UPDATE PROJECT
+    // =========================
+
     const result = await pool.query(
       `
         UPDATE projects
-
         SET
           title = $1,
           description = $2,
@@ -186,15 +281,13 @@ export async function updateProject(req: AuthRequest, res: Response) {
           status = $4,
           priority = $5,
           updated_at = CURRENT_TIMESTAMP
-
         WHERE id = $6
         AND user_id = $7
-
         RETURNING *;
       `,
       [
-        title,
-        description ?? '',
+        title.trim(),
+        description?.trim() ?? '',
         color ?? '#3B82F6',
         status ?? 'Planning',
         priority ?? 'Medium',
@@ -203,15 +296,60 @@ export async function updateProject(req: AuthRequest, res: Response) {
       ],
     );
 
+    // =========================
+    // NOT FOUND
+    // =========================
+
     if (result.rows.length === 0) {
       return res.status(404).json({
         message: 'Project not found',
       });
     }
 
+    const project = result.rows[0];
+
+    console.log('PROJECT UPDATED:', project);
+
+    // =========================
+    // CHECK UPDATE NOTIFICATIONS
+    // =========================
+
+    const settingsResult = await pool.query(
+      `
+        SELECT project_updated_notifications
+        FROM users
+        WHERE id = $1;
+      `,
+      [userId],
+    );
+
+    const notificationsEnabled =
+      settingsResult.rows[0]?.project_updated_notifications === true;
+
+    console.log('PROJECT UPDATED NOTIFICATIONS:', notificationsEnabled);
+
+    // =========================
+    // CREATE NOTIFICATION
+    // =========================
+
+    if (notificationsEnabled) {
+      await createNotification(
+        userId,
+        'project_updated',
+        'Project Updated',
+        `Project "${project.title}" was updated successfully.`,
+      );
+
+      console.log('UPDATE NOTIFICATION CREATED');
+    }
+
+    // =========================
+    // RESPONSE
+    // =========================
+
     return res.status(200).json({
       message: 'Project updated successfully',
-      project: result.rows[0],
+      project,
     });
   } catch (error) {
     console.error('UPDATE PROJECT ERROR:', error);
@@ -222,23 +360,106 @@ export async function updateProject(req: AuthRequest, res: Response) {
   }
 }
 
+// ============================================================
 // DELETE PROJECT
+// ============================================================
 
 export async function deleteProject(req: AuthRequest, res: Response) {
   try {
     const userId = req.user?.id;
-
     const { id } = req.params;
+
+    // =========================
+    // AUTHENTICATION
+    // =========================
+
+    if (!userId) {
+      return res.status(401).json({
+        message: 'Unauthorized',
+      });
+    }
+
+    // =========================
+    // GET PROJECT BEFORE DELETE
+    // =========================
+
+    const projectResult = await pool.query(
+      `
+        SELECT
+          id,
+          title
+        FROM projects
+        WHERE id = $1
+        AND user_id = $2;
+      `,
+      [id, userId],
+    );
+
+    // =========================
+    // NOT FOUND
+    // =========================
+
+    if (projectResult.rows.length === 0) {
+      return res.status(404).json({
+        message: 'Project not found',
+      });
+    }
+
+    const project = projectResult.rows[0];
+
+    console.log('PROJECT TO DELETE:', project);
+
+    // =========================
+    // DELETE PROJECT
+    // =========================
 
     await pool.query(
       `
-            DELETE FROM projects
-
-            WHERE id = $1
-            AND user_id = $2;
-            `,
+        DELETE FROM projects
+        WHERE id = $1
+        AND user_id = $2;
+      `,
       [id, userId],
     );
+
+    console.log('PROJECT DELETED:', project);
+
+    // =========================
+    // CHECK DELETE NOTIFICATIONS
+    // =========================
+
+    const settingsResult = await pool.query(
+      `
+        SELECT project_deleted_notifications
+        FROM users
+        WHERE id = $1;
+      `,
+      [userId],
+    );
+
+    const notificationsEnabled =
+      settingsResult.rows[0]?.project_deleted_notifications === true;
+
+    console.log('PROJECT DELETED NOTIFICATIONS:', notificationsEnabled);
+
+    // =========================
+    // CREATE DELETE NOTIFICATION
+    // =========================
+
+    if (notificationsEnabled) {
+      await createNotification(
+        userId,
+        'project_deleted',
+        'Project Deleted',
+        `Project "${project.title}" was deleted successfully.`,
+      );
+
+      console.log('DELETE NOTIFICATION CREATED');
+    }
+
+    // =========================
+    // RESPONSE
+    // =========================
 
     return res.status(200).json({
       message: 'Project deleted successfully',

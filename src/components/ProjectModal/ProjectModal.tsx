@@ -8,7 +8,7 @@ import type { Project } from '../../types/project';
 
 interface ProjectModalProps {
   onClose: () => void;
-  onCreated: () => void;
+  onCreated: () => void | Promise<void>;
   project?: Project | null;
 }
 
@@ -22,6 +22,10 @@ function ProjectModal({ onClose, onCreated, project }: ProjectModalProps) {
   const [priority, setPriority] = useState('Medium');
 
   const [loading, setLoading] = useState(false);
+
+  // =========================
+  // LOAD PROJECT DATA
+  // =========================
 
   useEffect(() => {
     if (project) {
@@ -39,27 +43,63 @@ function ProjectModal({ onClose, onCreated, project }: ProjectModalProps) {
     }
   }, [project]);
 
+  // =========================
+  // SUBMIT
+  // =========================
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    if (loading) {
+      return;
+    }
+
+    const trimmedTitle = title.trim();
+
+    if (!trimmedTitle) {
+      alert('Project title is required.');
+      return;
+    }
 
     try {
       setLoading(true);
 
       const projectData = {
-        title,
-        description,
+        title: trimmedTitle,
+        description: description.trim(),
         color,
         status,
         priority,
       };
 
+      // =========================
+      // UPDATE PROJECT
+      // =========================
+
       if (isEditing && project) {
         await updateProject(Number(project.id), projectData);
-      } else {
-        await createProject(projectData);
+
+        console.log('PROJECT UPDATED SUCCESSFULLY');
+
+        // Atualizar lista de projetos
+        await onCreated();
       }
 
-      onCreated();
+      // =========================
+      // CREATE PROJECT
+      // =========================
+      else {
+        const response = await createProject(projectData);
+
+        console.log('PROJECT CREATED SUCCESSFULLY:', response);
+
+        // Atualizar lista de projetos
+        await onCreated();
+      }
+
+      // =========================
+      // CLOSE MODAL
+      // =========================
 
       onClose();
     } catch (error) {
@@ -83,63 +123,111 @@ function ProjectModal({ onClose, onCreated, project }: ProjectModalProps) {
   return (
     <div className="project-modal-overlay">
       <div className="project-modal">
-        <h2>{isEditing ? 'Edit Project' : 'Create New Project'}</h2>
+        {/* =========================
+            HEADER
+        ========================= */}
+
+        <div className="project-modal-header">
+          <h2>{isEditing ? 'Edit Project' : 'Create New Project'}</h2>
+
+          <button
+            type="button"
+            className="project-modal-close"
+            onClick={onClose}
+            disabled={loading}
+            aria-label="Close">
+            ×
+          </button>
+        </div>
+
+        {/* =========================
+            FORM
+        ========================= */}
 
         <form onSubmit={handleSubmit}>
+          {/* TITLE */}
+
           <div className="form-group">
-            <label>Project Title</label>
+            <label htmlFor="project-title">Project Title</label>
 
             <input
+              id="project-title"
               type="text"
               placeholder="Project title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
+              disabled={loading}
               required
             />
           </div>
 
+          {/* DESCRIPTION */}
+
           <div className="form-group">
-            <label>Description</label>
+            <label htmlFor="project-description">Description</label>
 
             <textarea
+              id="project-description"
               placeholder="Project description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+              disabled={loading}
             />
           </div>
 
+          {/* COLOR */}
+
           <div className="color-picker">
-            <label>Project Color</label>
+            <label htmlFor="project-color">Project Color</label>
 
             <input
+              id="project-color"
               type="color"
               value={color}
               onChange={(e) => setColor(e.target.value)}
+              disabled={loading}
             />
           </div>
 
-          <div className="form-group">
-            <label>Status</label>
-
-            <select value={status} onChange={(e) => setStatus(e.target.value)}>
-              <option>Planning</option>
-              <option>Active</option>
-              <option>Completed</option>
-              <option>Archived</option>
-            </select>
-          </div>
+          {/* STATUS */}
 
           <div className="form-group">
-            <label>Priority</label>
+            <label htmlFor="project-status">Status</label>
 
             <select
-              value={priority}
-              onChange={(e) => setPriority(e.target.value)}>
-              <option>Low</option>
-              <option>Medium</option>
-              <option>High</option>
+              id="project-status"
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              disabled={loading}>
+              <option value="Planning">Planning</option>
+
+              <option value="Active">Active</option>
+
+              <option value="Completed">Completed</option>
+
+              <option value="Archived">Archived</option>
             </select>
           </div>
+
+          {/* PRIORITY */}
+
+          <div className="form-group">
+            <label htmlFor="project-priority">Priority</label>
+
+            <select
+              id="project-priority"
+              value={priority}
+              onChange={(e) => setPriority(e.target.value)}
+              disabled={loading}>
+              <option value="Low">Low</option>
+
+              <option value="Medium">Medium</option>
+
+              <option value="High">High</option>
+            </select>
+          </div>
+
+          {/* ACTIONS */}
 
           <div className="project-modal-actions">
             <button type="button" onClick={onClose} disabled={loading}>
