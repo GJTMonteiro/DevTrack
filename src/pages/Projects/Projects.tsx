@@ -18,10 +18,6 @@ function Projects() {
 
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
-  // =========================
-  // LOAD PROJECTS
-  // =========================
-
   async function loadProjects() {
     try {
       const data = await getProjects();
@@ -34,35 +30,19 @@ function Projects() {
     }
   }
 
-  // =========================
-  // INITIAL LOAD
-  // =========================
-
   useEffect(() => {
     loadProjects();
   }, []);
-
-  // =========================
-  // CREATE PROJECT
-  // =========================
 
   function handleCreateProject() {
     setSelectedProject(null);
     setShowModal(true);
   }
 
-  // =========================
-  // EDIT PROJECT
-  // =========================
-
   function handleEditProject(project: Project) {
     setSelectedProject(project);
     setShowModal(true);
   }
-
-  // =========================
-  // PROJECT CREATED / UPDATED
-  // =========================
 
   async function handleProjectSaved() {
     try {
@@ -76,19 +56,12 @@ function Projects() {
     }
   }
 
-  // =========================
-  // DELETE PROJECT
-  // =========================
-
   async function handleDeleteProject(projectId: number) {
     try {
-      // Eliminar projeto no backend
       await deleteProject(projectId);
 
-      // Atualizar lista de projetos
       await loadProjects();
 
-      // Atualizar Navbar / notificações
       notifyNotificationsUpdated();
     } catch (error) {
       console.error('DELETE PROJECT ERROR:', error);
@@ -101,10 +74,6 @@ function Projects() {
     }
   }
 
-  // =========================
-  // CLOSE MODAL
-  // =========================
-
   function handleCloseModal() {
     setShowModal(false);
     setSelectedProject(null);
@@ -112,10 +81,6 @@ function Projects() {
 
   return (
     <section className="projects-content">
-      {/* =========================
-          HEADER
-      ========================= */}
-
       <div className="projects-header">
         <div>
           <h1>Projects</h1>
@@ -130,14 +95,6 @@ function Projects() {
           + New Project
         </button>
       </div>
-
-      {/* =========================
-          SEARCH / FILTERS
-      ========================= */}
-
-      {/* =========================
-          PROJECTS
-      ========================= */}
 
       <div className="projects-container">
         <div className="projects-list">
@@ -155,10 +112,6 @@ function Projects() {
           )}
         </div>
       </div>
-
-      {/* =========================
-          PROJECT MODAL
-      ========================= */}
 
       {showModal && (
         <ProjectModal
