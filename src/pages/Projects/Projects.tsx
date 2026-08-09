@@ -135,24 +135,6 @@ function Projects() {
           SEARCH / FILTERS
       ========================= */}
 
-      <div className="projects-search">
-        <input type="text" placeholder="Search projects..." />
-
-        <select className="projects-filter">
-          <option>All Projects</option>
-          <option>Active</option>
-          <option>Completed</option>
-          <option>Archived</option>
-        </select>
-
-        <select className="priority-filter">
-          <option>All priorities</option>
-          <option>Low</option>
-          <option>Medium</option>
-          <option>High</option>
-        </select>
-      </div>
-
       {/* =========================
           PROJECTS
       ========================= */}
