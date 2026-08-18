@@ -1,6 +1,5 @@
+import apiFetch from './api';
 import type { Project } from '../types/project';
-
-const API_URL = 'http://localhost:3000/api/projects';
 
 interface ProjectsResponse {
   projects: Project[];
@@ -20,36 +19,14 @@ interface DeleteProjectResponse {
   message: string;
 }
 
-interface ErrorResponse {
-  message?: string;
-}
-
 // ==========================
 // GET PROJECTS
 // ==========================
 
 export async function getProjects(): Promise<ProjectsResponse> {
-  const token = localStorage.getItem('token');
+  const data = await apiFetch('/projects');
 
-  const response = await fetch(API_URL, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-  });
-
-  const data = (await response.json()) as ProjectsResponse | ErrorResponse;
-
-  if (!response.ok) {
-    throw new Error(
-      'message' in data && data.message
-        ? data.message
-        : 'Failed to fetch projects',
-    );
-  }
-
-  return data as ProjectsResponse;
+  return data;
 }
 
 // ==========================
@@ -63,30 +40,12 @@ export async function createProject(projectData: {
   status?: string;
   priority?: string;
 }): Promise<CreateProjectResponse> {
-  const token = localStorage.getItem('token');
-
-  const response = await fetch(API_URL, {
+  const data = await apiFetch('/projects', {
     method: 'POST',
-
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-
     body: JSON.stringify(projectData),
   });
 
-  const data = (await response.json()) as CreateProjectResponse | ErrorResponse;
-
-  if (!response.ok) {
-    throw new Error(
-      'message' in data && data.message
-        ? data.message
-        : 'Failed to create project',
-    );
-  }
-
-  return data as CreateProjectResponse;
+  return data;
 }
 
 // ==========================
@@ -103,30 +62,12 @@ export async function updateProject(
     priority?: string;
   },
 ): Promise<UpdateProjectResponse> {
-  const token = localStorage.getItem('token');
-
-  const response = await fetch(`${API_URL}/${projectId}`, {
+  const data = await apiFetch(`/projects/${projectId}`, {
     method: 'PUT',
-
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-
     body: JSON.stringify(projectData),
   });
 
-  const data = (await response.json()) as UpdateProjectResponse | ErrorResponse;
-
-  if (!response.ok) {
-    throw new Error(
-      'message' in data && data.message
-        ? data.message
-        : 'Failed to update project',
-    );
-  }
-
-  return data as UpdateProjectResponse;
+  return data;
 }
 
 // ==========================
@@ -136,26 +77,9 @@ export async function updateProject(
 export async function deleteProject(
   projectId: number,
 ): Promise<DeleteProjectResponse> {
-  const token = localStorage.getItem('token');
-
-  const response = await fetch(`${API_URL}/${projectId}`, {
+  const data = await apiFetch(`/projects/${projectId}`, {
     method: 'DELETE',
-
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
   });
 
-  const data = (await response.json()) as DeleteProjectResponse | ErrorResponse;
-
-  if (!response.ok) {
-    throw new Error(
-      'message' in data && data.message
-        ? data.message
-        : 'Failed to delete project',
-    );
-  }
-
-  return data as DeleteProjectResponse;
+  return data;
 }

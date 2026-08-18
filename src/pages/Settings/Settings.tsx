@@ -11,6 +11,8 @@ import {
   type SettingsData,
 } from '../../services/settings.service';
 
+import apiFetch from '../../services/api';
+
 import { useTheme } from '../../components/context/ThemeContext';
 
 import {
@@ -185,33 +187,13 @@ function Settings() {
     try {
       setPasswordLoading(true);
 
-      const token = localStorage.getItem('token');
-
-      const response = await fetch(
-        'http://localhost:3000/api/profile/password',
-        {
-          method: 'PUT',
-
-          headers: {
-            'Content-Type': 'application/json',
-
-            ...(token && {
-              Authorization: `Bearer ${token}`,
-            }),
-          },
-
-          body: JSON.stringify({
-            currentPassword,
-            newPassword,
-          }),
-        },
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to change password.');
-      }
+      await apiFetch('/profile/password', {
+        method: 'PUT',
+        body: JSON.stringify({
+          currentPassword,
+          newPassword,
+        }),
+      });
 
       setPasswordSuccess('Password changed successfully.');
 
@@ -395,9 +377,7 @@ function Settings() {
           <h2>Notifications</h2>
         </div>
 
-        {/* ======================================================
-            PROJECT CREATED
-        ====================================================== */}
+        {/* PROJECT CREATED */}
 
         <div className="settings-option">
           <div>
@@ -420,9 +400,7 @@ function Settings() {
           </label>
         </div>
 
-        {/* ======================================================
-            PROJECT UPDATED
-        ====================================================== */}
+        {/* PROJECT UPDATED */}
 
         <div className="settings-option">
           <div>
@@ -445,9 +423,7 @@ function Settings() {
           </label>
         </div>
 
-        {/* ======================================================
-            PROJECT DELETED
-        ====================================================== */}
+        {/* PROJECT DELETED */}
 
         <div className="settings-option">
           <div>
@@ -470,9 +446,7 @@ function Settings() {
           </label>
         </div>
 
-        {/* ======================================================
-            TASK CREATED
-        ====================================================== */}
+        {/* TASK CREATED */}
 
         <div className="settings-option">
           <div>
@@ -495,9 +469,7 @@ function Settings() {
           </label>
         </div>
 
-        {/* ======================================================
-            TASK UPDATED
-        ====================================================== */}
+        {/* TASK UPDATED */}
 
         <div className="settings-option">
           <div>
@@ -520,9 +492,7 @@ function Settings() {
           </label>
         </div>
 
-        {/* ======================================================
-            TASK DELETED
-        ====================================================== */}
+        {/* TASK DELETED */}
 
         <div className="settings-option">
           <div>

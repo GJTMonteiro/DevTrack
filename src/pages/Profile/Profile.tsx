@@ -26,6 +26,8 @@ import { getProjects } from '../../services/project.service';
 
 import { getProfile, type ProfileData } from '../../services/profile.service';
 
+import apiFetch from '../../services/api';
+
 import type { Project } from '../../types/project';
 
 import Skills from '../../components/Skills/Skills';
@@ -86,25 +88,7 @@ function Profile() {
 
     async function loadActivities() {
       try {
-        const token = localStorage.getItem('token');
-
-        if (!token) {
-          return;
-        }
-
-        const response = await fetch('http://localhost:3000/api/activities', {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to load activities');
-        }
-
-        const data = await response.json();
+        const data = await apiFetch('/activities');
 
         setActivities(data.activities);
       } catch (error) {

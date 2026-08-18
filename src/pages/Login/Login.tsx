@@ -9,6 +9,8 @@ import {
   MdTrendingUp,
 } from 'react-icons/md';
 
+import apiFetch from '../../services/api';
+
 function Login() {
   const navigate = useNavigate();
 
@@ -23,45 +25,29 @@ function Login() {
       .value;
 
     try {
-      const response = await fetch('http://localhost:3000/api/auth/login', {
+      const data = await apiFetch('/auth/login', {
         method: 'POST',
-
-        headers: {
-          'Content-Type': 'application/json',
-        },
-
         body: JSON.stringify({
           email,
           password,
         }),
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        alert(data.message);
-
-        return;
-      }
-
       // Guardar JWT
-      localStorage.setItem(
-      'token',
-      data.token
-);
-
+      localStorage.setItem('token', data.token);
 
       // Guardar utilizador
-      localStorage.setItem(
-      "user",
-      JSON.stringify(data.user)
-);
+      localStorage.setItem('user', JSON.stringify(data.user));
 
       navigate('/dashboard');
     } catch (error) {
       console.error('LOGIN ERROR:', error);
 
-      alert('Unable to connect to server');
+      if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert('Unable to connect to server');
+      }
     }
   }
 

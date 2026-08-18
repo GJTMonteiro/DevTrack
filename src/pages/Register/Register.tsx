@@ -9,6 +9,8 @@ import {
   MdTrendingUp,
 } from 'react-icons/md';
 
+import apiFetch from '../../services/api';
+
 function Register() {
   const navigate = useNavigate();
 
@@ -37,11 +39,8 @@ function Register() {
     }
 
     try {
-      const response = await fetch('http://localhost:3000/api/auth/register', {
+      const data = await apiFetch('/auth/register', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({
           name,
           username,
@@ -50,16 +49,8 @@ function Register() {
         }),
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        alert(data.message);
-        return;
-      }
-
       // Guardar dados básicos do utilizador
       localStorage.setItem('userName', data.user.name);
-
       localStorage.setItem('username', data.user.username);
 
       alert('Account created successfully!');
@@ -68,7 +59,11 @@ function Register() {
     } catch (error) {
       console.error('REGISTER ERROR:', error);
 
-      alert('Unable to connect to server');
+      if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert('Unable to connect to server');
+      }
     }
   }
 
