@@ -7,15 +7,13 @@ const PORT = process.env.PORT || 3000;
 
 async function startServer() {
   try {
-    console.log('JWT_SECRET:', process.env.JWT_SECRET);
-
     const result = await pool.query('SELECT NOW()');
 
     console.log('✅ Database connected!');
     console.log(result.rows[0]);
 
     app.listen(PORT, () => {
-      console.log(`🚀 Server running on http://localhost:${PORT}`);
+      console.log(`🚀 Server running on port ${PORT}`);
     });
   } catch (error) {
     console.error('❌ Database connection failed');
